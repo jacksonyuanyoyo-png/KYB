@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["type"],
+  "properties": {
+    "type": {
+      "type": ["string", "null"],
+      "enum": [
+        "corporation",
+        "charity",
+        "trust",
+        "ipp_rca",
+        "partnership",
+        "estate",
+        "condo",
+        "pooled_fund",
+        "association",
+        "first_nation",
+        null
+      ]
+    },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "reasons": { "type": "array", "maxItems": 3, "items": { "type": "string" } }
+  }
+}

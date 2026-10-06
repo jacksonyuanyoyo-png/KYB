@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Complex Account Guide — v20</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, sans-serif; font-size: 15px; background: #f5f5f3; color: #1a1a1a; min-height: 100vh; }
+button, input, select { font-family: inherit; }
+.app { display: flex; flex-direction: column; height: 100vh; }
+.topbar { background: #185FA5; color: #fff; padding: 8px 18px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; gap: 16px; }
+.tb-title { font-size: 15px; font-weight: 700; }
+.tb-sub { font-size: 11px; opacity: .75; margin-top: 2px; }
+.tb-actions { display: flex; align-items: center; gap: 8px; }
+.tb-badge { background: rgba(255,255,255,.15); font-size: 11px; padding: 3px 12px; border-radius: 20px; font-weight: 600; }
+.tb-btn { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22); color: #fff; font-size: 11px; padding: 5px 12px; border-radius: 7px; cursor: pointer; font-weight: 600; transition: background .15s; white-space: nowrap; display: inline-flex; align-items: center; gap: 5px; }
+.tb-btn:hover { background: rgba(255,255,255,.25); }
+.tb-status { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22); color: #fff; font-size: 11px; padding: 4px 8px; border-radius: 7px; font-weight: 600; cursor: pointer; }
+.tb-status option { color: #111; }
+.phase-bar { background: #fff; border-bottom: 1px solid #e5e5e3; padding: 0 24px; display: flex; align-items: stretch; flex-shrink: 0; }
+.ph { display: flex; align-items: center; gap: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; color: #bbb; cursor: pointer; border: none; border-bottom: 3px solid transparent; transition: all .15s; white-space: nowrap; background: none; }
+.ph:hover { color: #185FA5; }
+.ph.active { color: #185FA5; border-bottom-color: #185FA5; }
+.ph.done { color: #1D9E75; }
+.ph-num { width: 20px; height: 20px; border-radius: 50%; background: #e8e8e6; color: #999; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+.ph.active .ph-num { background: #185FA5; color: #fff; }
+.ph.done .ph-num { background: #1D9E75; color: #fff; }
+.ph-sep { color: #ddd; padding: 0 4px; align-self: center; font-size: 16px; }
+.p1-shell { display: flex; flex: 1; overflow: hidden; min-height: 0; }
+.defs-panel { width: 248px; min-width: 248px; background: #fff; border-right: 1px solid #e5e5e3; overflow-y: auto; padding: 14px 12px; flex-shrink: 0; }
+.defs-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.defs-heading { font-size: 11px; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: .07em; }
+.defs-toggle-btn { border: none; background: none; cursor: pointer; font-size: 16px; color: #ccc; padding: 4px 6px; border-radius: 6px; line-height: 1; }
+.defs-toggle-btn:hover { background: #f5f5f3; color: #555; }
+.def-card { padding: 11px 12px; border-radius: 9px; margin-bottom: 7px; border: 1px solid; }
+.def-card.own { background: #EBF4FF; border-color: #B5D4F4; }
+.def-card.ctrl { background: #EAF3DE; border-color: #C0DD97; }
+.def-card.look { background: #FAEEDA; border-color: #FAC775; }
+.def-card.done-c { background: #f5f5f3; border-color: #e5e5e3; }
+.def-card.nffe { background: #F3EDFB; border-color: #C9ADE8; }
+.def-card.pulse { animation: nodepulse 1s ease 2; }
+@keyframes nodepulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(24,95,165,.25); } 50% { box-shadow: 0 0 0 4px rgba(24,95,165,.18); } }
+.def-icon { width: 18px; height: 18px; margin-bottom: 5px; color: #185FA5; }
+.def-card.ctrl .def-icon { color: #27500A; }
+.def-card.look .def-icon { color: #854F0B; }
+.def-card.nffe .def-icon { color: #5B3A8F; }
+.def-title { font-size: 11px; font-weight: 700; color: #111; margin-bottom: 4px; }
+.def-body { font-size: 12px; color: #444; line-height: 1.6; }
+.def-body strong { color: #111; }
+.defs-divider { border: none; border-top: 1px solid #e5e5e3; margin: 14px 0; }
+.defs-tip { font-size: 11px; color: #888; line-height: 1.55; padding: 8px 10px; background: #f9f9f7; border-radius: 7px; border: 1px solid #e5e5e3; }
+.defs-tip strong { color: #444; display: block; margin-bottom: 3px; font-size: 11px; }
+.work { flex: 1; display: flex; flex-direction: column; min-width: 0; background: #f9f9f7; }
+.diagram-canvas-wrap { flex: 1; overflow: auto; padding: 20px 24px 28px; display: flex; flex-direction: column; align-items: center; }
+.diagram-footer { flex-shrink: 0; background: #fff; border-top: 1px solid #e5e5e3; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.footer-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+.zoom-ctrl { display: flex; align-items: center; gap: 1px; border: 1px solid #e5e5e3; border-radius: 7px; background: #fff; padding: 1px; }
+.zoom-ctrl button { border: none; background: transparent; padding: 3px 9px; font-size: 15px; font-weight: 400; min-width: 0; cursor: pointer; color: #333; border-radius: 6px; }
+.zoom-ctrl button:hover:not(:disabled) { background: #f0f0ee; }
+.zoom-ctrl .zoom-fit-btn { font-size: 11px; font-weight: 600; }
+.zoom-label { font-size: 11px; color: #666; font-weight: 600; min-width: 34px; text-align: center; }
+.empty-diagram { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 8px 24px 24px; width: 100%; }
+.empty-icon { color: #c5c5c2; margin-bottom: 8px; }
+.empty-title { font-size: 17px; font-weight: 700; color: #333; margin-bottom: 8px; }
+.empty-sub { font-size: 13px; color: #888; max-width: 460px; line-height: 1.55; margin-bottom: 14px; }
+.empty-teaser { width: 100%; max-width: 640px; display: flex; flex-direction: column; margin-bottom: 18px; text-align: left; border: 1px solid #e5e5e3; border-radius: 10px; overflow: hidden; background: #fff; }
+.empty-teaser-lead { font-size: 11px; font-weight: 700; color: #666; text-transform: uppercase; letter-spacing: .05em; padding: 9px 14px; background: #f9f9f7; border-bottom: 1px solid #e5e5e3; }
+.empty-teaser-btn { display: flex; align-items: flex-start; gap: 10px; padding: 9px 14px; font-size: 12px; color: #333; line-height: 1.45; background: none; border: none; border-top: 1px solid #f0f0ee; cursor: pointer; text-align: left; width: 100%; }
+.empty-teaser-btn:first-of-type { border-top: none; }
+.empty-teaser-btn:hover { background: #EBF4FF; color: #0C447C; }
+.empty-teaser-icon { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; color: #185FA5; }
+.entity-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; width: 100%; max-width: 680px; margin-bottom: 16px; }
+.etype { padding: 10px 12px; border: 1.5px solid #e5e5e3; border-radius: 9px; cursor: pointer; background: #fff; transition: all .15s; text-align: left; }
+.etype:hover { border-color: #185FA5; background: #EBF4FF; }
+.etype.sel { border-color: #185FA5; background: #EBF4FF; box-shadow: 0 0 0 2px rgba(24,95,165,.12); }
+.etype-icon { width: 20px; height: 20px; margin-bottom: 6px; color: #185FA5; display: block; }
+.etype-name { font-size: 13px; font-weight: 700; color: #111; display: block; line-height: 1.3; }
+.etype-desc { font-size: 11px; color: #999; margin-top: 2px; display: block; line-height: 1.35; }
+.name-row { display: flex; max-width: 480px; width: 100%; }
+.name-row input { flex: 1; font-size: 14px; padding: 10px 13px; border: 1.5px solid #d5d5d3; border-radius: 8px; background: #fff; color: #111; width: 100%; }
+.name-row input:focus { outline: none; border-color: #185FA5; box-shadow: 0 0 0 2px rgba(24,95,165,.1); }
+.start-row { display: flex; gap: 10px; margin-top: 14px; align-items: center; flex-wrap: wrap; justify-content: center; }
+.btn { padding: 8px 18px; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1.5px solid #d5d5d3; background: #fff; color: #111; transition: all .15s; display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover { background: #f5f5f3; }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.btn-primary { background: #185FA5; color: #fff; border-color: #185FA5; }
+.btn-primary:hover:not(:disabled) { background: #0C447C; }
+.btn-sm { padding: 5px 12px; font-size: 12px; }
+.btn-ghost { background: transparent; border-color: transparent; color: #185FA5; }
+.btn-ghost:hover { background: #EBF4FF; }
+.name-hint { font-size: 11px; color: #BA7517; margin-top: 8px; }
+.or-divider { display: flex; align-items: center; gap: 12px; width: 100%; max-width: 680px; margin: 16px 0 10px; }
+.or-divider hr { flex: 1; border: none; border-top: 1px solid #e5e5e3; }
+.or-divider span { font-size: 11px; color: #bbb; white-space: nowrap; }
+.ai-note { font-size: 10px; color: #aaa; margin-top: 6px; text-align: center; }
+.tree-wrap { padding: 48px 20px; display: flex; justify-content: center; width: 100%; }
+.d-node { border-radius: 10px; border: 2px solid #185FA5; padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start; background: #185FA5; text-align: left; min-width: 200px; max-width: 240px; }
+.d-node-name { font-size: 13px; font-weight: 700; color: #fff; line-height: 1.35; }
+.d-node-meta { font-size: 11px; color: rgba(255,255,255,.75); margin-top: 3px; }
+.d-node-icon { color: #fff; flex-shrink: 0; }
+.placeholder { max-width: 640px; margin: 48px auto; background: #fff; border: 1px solid #e5e5e3; border-radius: 12px; padding: 28px; }
+.placeholder h2 { font-size: 18px; margin-bottom: 8px; }
+.placeholder p { font-size: 13px; color: #666; line-height: 1.6; }
+#assist-fab { position: fixed; bottom: 18px; right: 18px; z-index: 800; display: flex; align-items: center; gap: 7px; background: #5B3A8F; color: #fff; border: none; border-radius: 999px; padding: 11px 18px; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(91,58,143,.35); }
+#assist-fab:hover { transform: translateY(-1px); }
+#assist-drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 380px; max-width: 100vw; background: #fff; z-index: 900; border-left: 1px solid #e5e5e3; box-shadow: -6px 0 24px rgba(0,0,0,.12); display: flex; flex-direction: column; transform: translateX(105%); transition: transform .22s ease; }
+#assist-drawer.open { transform: translateX(0); }
+.as-head { display: flex; align-items: center; gap: 8px; padding: 12px 14px; background: #5B3A8F; color: #fff; }
+.as-head-title { font-size: 13px; font-weight: 800; }
+.as-head-sub { font-size: 10px; opacity: .75; }
+.as-close { margin-left: auto; background: none; border: none; color: #fff; font-size: 18px; cursor: pointer; }
+.as-body { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.as-msg { max-width: 88%; padding: 8px 11px; border-radius: 11px; font-size: 12px; line-height: 1.55; }
+.as-msg.ai { align-self: flex-start; background: #f2f0f6; color: #1a1a1a; border-bottom-left-radius: 3px; }
+.as-foot { border-top: 1px solid #e5e5e3; padding: 10px 12px; display: flex; gap: 7px; }
+.as-foot input { flex: 1; border: 1px solid #d5d5d2; border-radius: 9px; padding: 8px 10px; font-size: 12px; }
+.as-send { background: #5B3A8F; color: #fff; border: none; border-radius: 9px; padding: 0 15px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.modal { background: #fff; border-radius: 12px; width: min(520px, 100%); padding: 20px 22px; box-shadow: 0 16px 48px rgba(0,0,0,.18); }
+.modal h3 { font-size: 16px; margin-bottom: 8px; }
+.modal p { font-size: 13px; color: #555; line-height: 1.55; }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(12px); background: #111; color: #fff; font-size: 13px; padding: 10px 14px; border-radius: 8px; opacity: 0; pointer-events: none; transition: .2s; z-index: 1100; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+@media (max-width: 900px) {
+  .entity-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .defs-panel { width: 210px; min-width: 210px; }
+}
+.tree-stage { transform-origin: top center; transition: transform .15s ease; }
+.tree-level { display: flex; justify-content: center; align-items: flex-start; gap: 18px; margin-top: 24px; }
+.tree-branch { display: flex; flex-direction: column; align-items: center; position: relative; }
+.tree-branch::before { content: ""; position: absolute; top: -24px; width: 1px; height: 24px; background: #b8c6d3; }
+.tree-level.root > .tree-branch::before { display: none; }
+.node-card { min-width: 210px; max-width: 250px; border: 2px solid #185FA5; background: #fff; border-radius: 10px; padding: 11px 12px; box-shadow: 0 2px 7px rgba(0,0,0,.06); }
+.node-card.person { border-color: #1D9E75; }
+.node-title { font-size: 13px; font-weight: 750; }
+.node-meta { font-size: 11px; color: #666; margin-top: 4px; line-height: 1.4; }
+.node-actions { display: flex; gap: 5px; margin-top: 9px; flex-wrap: wrap; }
+.node-actions button { border: 1px solid #d7d7d4; border-radius: 5px; background: #fff; color: #185FA5; padding: 3px 7px; font-size: 10px; cursor: pointer; }
+.warning-bar { width: 100%; max-width: 760px; background: #FAEEDA; border: 1px solid #FAC775; color: #633806; border-radius: 8px; padding: 9px 12px; font-size: 11px; line-height: 1.45; margin-bottom: 12px; }
+.form-page { width: min(760px, 100%); margin: 18px auto; }
+.form-card { background: #fff; border: 1px solid #e5e5e3; border-radius: 10px; padding: 16px; margin-bottom: 12px; }
+.form-card h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 12px; color: #555; }
+.form-card label { display: block; font-size: 11px; font-weight: 700; margin-bottom: 5px; }
+.form-card select, .form-card input[type="text"] { width: 100%; max-width: 380px; padding: 8px; border: 1px solid #d5d5d2; border-radius: 6px; }
+.choice-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+.choice { border: 1px solid #e1e1df; border-radius: 7px; padding: 10px; font-size: 12px; cursor: pointer; }
+.choice input { margin-right: 7px; }
+.page-actions { display: flex; justify-content: space-between; gap: 10px; margin-top: 14px; }
+.owner-modal { width:min(420px,calc(100vw - 40px)); max-height:calc(100vh - 20px); overflow-y:auto; padding:18px 20px 16px; border-radius:10px; }
+.owner-modal h3 { font-size:14px; margin:0 0 3px; }
+.owner-sub { font-size:10px!important; color:#777!important; margin:0 0 13px; }
+.owner-tabs { display:flex; margin:0 0 13px; }
+.owner-tabs button { flex:1; height:31px; padding:0 8px; border:1px solid #c9c9c7; background:#fff; color:#222; cursor:pointer; font-size:11px; }
+.owner-tabs button:first-child { border-radius:7px 0 0 7px; }
+.owner-tabs button:last-child { border-radius:0 7px 7px 0; border-left:0; }
+.owner-tabs button.sel { background:#1468ad; color:#fff; border-color:#1468ad; font-weight:700; }
+.owner-info { display:flex; gap:8px; background:#eaf4ff; border:1px solid #a9cdf2; color:#075091; border-radius:7px; padding:9px 11px; font-size:10px; line-height:1.45; margin-bottom:11px; }
+.owner-info b { font-family:Georgia,serif; font-size:14px; line-height:1; }
+.owner-form { display:flex; flex-direction:column; gap:10px; }
+.owner-field>label,.owner-label { display:block; font-size:9px; line-height:1.2; font-weight:800; letter-spacing:.055em; text-transform:uppercase; color:#555; margin-bottom:6px; }
+.owner-field>input,.owner-field>select { width:100%; height:27px; border:1px solid #c9c9c7; border-radius:7px; background:#fff; padding:0 10px; font-size:11px; color:#111; }
+.owner-field>input:focus,.owner-field>select:focus { outline:none; border-color:#1269b0; box-shadow:0 0 0 1px #1269b0; }
+.owner-card-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; }
+.owner-card-grid.tax { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.owner-choice { position:relative; min-height:54px; border:1px solid #d5d5d2; border-radius:7px; padding:8px 11px; cursor:pointer; background:#fff; display:flex; flex-direction:column; justify-content:center; }
+.owner-choice:has(input:checked) { background:#eaf4ff; border-color:#0969b5; }
+.owner-choice input { position:absolute; top:9px; left:50%; transform:translateX(-50%); margin:0; accent-color:#1269b0; }
+.owner-choice strong { font-size:10px; line-height:1.2; margin-top:14px; font-weight:600; }
+.owner-choice small { display:block; color:#999; font-size:8px; line-height:1.35; text-transform:uppercase; letter-spacing:.06em; margin-top:3px; font-weight:800; }
+.owner-choice.tax-choice { height:100px; min-height:100px; justify-content:flex-start; overflow:hidden; }
+.entity-types { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
+.entity-choice { position:relative; height:40px; min-height:40px; overflow:hidden; border:1px solid #d5d5d2; border-radius:7px; padding:4px 9px; cursor:pointer; font-size:7.5px; line-height:1.1; font-weight:750; display:flex; flex-direction:column; justify-content:center; white-space:nowrap; }
+.entity-choice:has(input:checked) { background:#eaf4ff; border-color:#0969b5; }
+.entity-choice input { position:absolute; opacity:0; pointer-events:none; }
+.entity-choice .etype-mini-icon { display:block; font-size:11px; margin-bottom:1px; }
+.ownership-row { display:flex; align-items:center; gap:5px; }
+.ownership-row input { width:73px; height:31px; border:1px solid #c9c9c7; border-radius:6px; padding:0 10px; font-size:11px; }
+.ownership-row span { font-size:10px; color:#666; }
+.owner-tally { margin-top:5px; font-size:9px; line-height:1.55; }
+.owner-tally .ok { color:#1D9E75; }
+.owner-tally .fintrac { color:#1468ad; }
+.owner-check { display:block; background:#f6f6f5; border-radius:7px; padding:9px 8px; cursor:pointer; }
+.owner-check.plain { background:#fff; padding:2px 0; }
+.owner-check input { width:13px; height:13px; margin:0 3px 0 0; accent-color:#4d3c86; vertical-align:top; }
+.owner-check strong { font-size:11px; line-height:1.3; text-transform:uppercase; }
+.owner-check small { display:block; color:#999; font-size:8px; line-height:1.45; text-transform:uppercase; letter-spacing:.055em; margin-top:3px; font-weight:800; }
+.owner-actions { background:#fff; border-top:1px solid #ddd; margin-top:2px; padding:13px 0 0; display:flex; justify-content:flex-end; gap:8px; }
+.owner-actions .btn { padding:7px 14px; font-size:11px; }
+@media(max-width:480px) {
+  .overlay { padding:10px; }
+  .owner-modal { width:345px; max-width:calc(100vw - 30px); padding:18px 17px 16px; }
+  .owner-card-grid.tax { gap:5px; }
+  .owner-choice.tax-choice { padding:9px 8px; }
+}
+.check-head { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:14px; }
+.check-section { background:#fff; border:1px solid #e5e5e3; border-radius:9px; margin-bottom:10px; overflow:hidden; }
+.check-section h3 { padding:10px 13px; font-size:12px; background:#fafaf8; border-bottom:1px solid #ececea; display:flex; justify-content:space-between; }
+.check-item { padding:10px 13px; border-top:1px solid #f0f0ee; display:flex; gap:9px; align-items:flex-start; font-size:12px; }
+.check-item:first-of-type { border-top:0; }
+.check-item small { display:block; color:#888; margin-top:3px; }
+.conditional { color:#9a5b00; font-size:9px; font-weight:800; }
+.progress-track { height:7px; background:#e8e8e6; border-radius:6px; overflow:hidden; margin-top:5px; }
+.progress-fill { height:100%; background:#1D9E75; }
+.print-only { display:none; }
+@media print {
+  body { background:#fff; font-size:12px; }
+  .topbar,.phase-bar,#assist-fab,#assist-drawer,.page-actions,.no-print { display:none!important; }
+  .app { height:auto; }
+  .p1-shell,.diagram-canvas-wrap { display:block!important; overflow:visible!important; padding:0!important; }
+  .form-page { width:100%; margin:0; }
+  .check-section { break-inside:avoid; }
+  .print-only { display:block; }
+}
+body { background:#f4f6fb; color:#1b2430; }
+.topbar { background:#fff; color:#1b2430; border-bottom:1px solid #e6eaf1; }
+.tb-title { color:#1b2430; } .tb-sub { color:#6d7785; opacity:1; }
+.tb-btn,.tb-status { background:#fff; color:#1b2430; border:1px solid #d9dfeb; }
+.tb-btn:hover { background:#f6f8fb; }
+.tb-badge { background:#eaf1ff; color:#315fc7; }
+.phase-bar { background:transparent; border:0; padding:18px 28px 0; gap:8px; }
+.ph { color:#98a2b3; border:0; padding:0 8px 0 0; }
+.ph-num { border:1.5px solid #d5dbe6; background:#fff; color:#98a2b3; }
+.ph.active { color:#1b2430; } .ph.active .ph-num,.ph.done .ph-num { background:#178a4b; color:#fff; border-color:#178a4b; }
+#shell { display:flex; min-height:0; }
+.case-layout { flex:1; min-height:0; display:grid; grid-template-columns:290px minmax(0,1fr) 300px; }
+.rail { overflow:auto; padding:8px 16px 24px; display:flex; flex-direction:column; gap:12px; }
+.surface { background:#fff; border-radius:18px; box-shadow:0 10px 30px rgba(28,39,68,.08); padding:14px; }
+.surface h3 { margin:0 0 10px; font-size:15px; }
+.check-line { display:flex; justify-content:space-between; gap:10px; padding:8px 0; border-top:1px solid #eef1f6; font-size:12px; }
+.check-line:first-of-type { border-top:0; }
+.pill { display:inline-flex; border-radius:999px; padding:2px 8px; font-size:11px; font-weight:750; }
+.pill.ok { color:#178a4b; background:#e8f8ee; } .pill.wait { color:#315fc7; background:#eaf1ff; } .pill.warn { color:#b7791f; background:#fff6e4; }
+.party-card { background:#fff; border-radius:16px; box-shadow:0 10px 28px rgba(28,39,68,.08); padding:12px; min-width:220px; }
+.party-card .who { display:flex; gap:10px; align-items:center; }
+.avatar { width:36px; height:36px; border-radius:50%; background:#eef2f7; display:grid; place-items:center; font-size:11px; font-weight:750; }
+.party-card strong,.party-card .meta { display:block; } .party-card .meta { color:#6d7785; font-size:12px; margin-top:2px; }
+.concept { font-size:12px; color:#526073; line-height:1.45; } .concept b { display:block; color:#1b2430; margin-bottom:2px; }
+.work { background:transparent; }
+.diagram-footer { background:transparent; border:0; }
+@media(max-width:980px){ .case-layout { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div>
+      <div class="tb-title">Complex Account Guide</div>
+      <div class="tb-sub">CIRO · FINTRAC · IRS — Document Requirement Guide v20</div>
+    </div>
+    <div class="tb-actions">
+      <button class="tb-btn" type="button" onclick="showAccounts()">Accounts</button>
+      <select id="tb-status" class="tb-status" title="Status of this account file" onchange="setStatus(this.value)">
+        <option value="building">Building</option>
+        <option value="docs">Docs requested</option>
+        <option value="ready">Ready for compliance</option>
+      </select>
+      <button class="tb-btn" type="button" onclick="showModal('NAAF', 'Fill the Qtrade Corporate / Non-Personal Account Application Form with this account\'s data. Build the ownership diagram first, then export.')">NAAF</button>
+      <button class="tb-btn" type="button" onclick="showModal('Resolution', 'Fill the Qtrade Certified Resolution for Corporate Accounts with directors and beneficial owners from the diagram.')">Resolution</button>
+      <button class="tb-btn" type="button" onclick="saveProgress()">Save</button>
+      <label class="tb-btn" title="Load a previously saved file">Load<input type="file" accept=".json" style="display:none" onchange="loadProgress(this)"></label>
+      <div class="tb-badge" id="tb-badge">Step 1 of 3</div>
+    </div>
+  </header>
+  <nav class="phase-bar" id="phase-bar"></nav>
+  <div class="p1-shell" id="shell"></div>
+</div>
+<button id="assist-fab" type="button" onclick="toggleAssist()">Assistant</button>
+<aside id="assist-drawer" aria-label="AI assistant panel">
+  <div class="as-head">
+    <div>
+      <div class="as-head-title">Account Assistant</div>
+      <div class="as-head-sub">Sees this screen · can fill in data for you</div>
+    </div>
+    <button class="as-close" type="button" onclick="toggleAssist()">×</button>
+  </div>
+  <div class="as-body" id="assist-body">
+    <div class="as-msg ai">Select an entity type and enter its legal name. I can walk you through owners, controllers, and the documents this account will need.</div>
+  </div>
+  <form class="as-foot" onsubmit="sendAssist(event)">
+    <input id="assist-input" placeholder="Ask about this account…" autocomplete="off">
+    <button class="as-send" type="submit">Send</button>
+  </form>
+</aside>
+<div id="modal-root"></div>
+<div class="toast" id="toast"></div>
+<script>
+const ET = {
+  corp: { label: "Corporation", desc: "Non-publicly traded limited company", rule: "3204" },
+  charity: { label: "Non-Profit / Charity / Foundation", desc: "Registered charity, NPO, or foundation", rule: "3204" },
+  trust: { label: "Formal Trust", desc: "Inter vivos or testamentary trust", rule: "3203" },
+  ipp: { label: "IPP / RCA", desc: "Individual Pension Plan or RCA", rule: "3203" },
+  lp: { label: "Partnership / LP", desc: "General or limited partnership, investment club", rule: "3203" },
+  estate: { label: "Estate", desc: "Estate of a deceased individual", rule: "3203" },
+  condo: { label: "Condo Corporation", desc: "Provincial condominium corporation", rule: "3204" },
+  fund: { label: "Pooled Fund", desc: "Mutual / hedge / PE / pooled fund", rule: "3204" },
+  union: { label: "Association / Union", desc: "Labour org, association, or other entity", rule: "3204" },
+  fn: { label: "First Nation / Indigenous Gov", desc: "Band, tribal council, or Indigenous government body", rule: "3204" }
+};
+const GUIDANCE = {
+  corp: "Add every person owning ≥25% of shares, plus all authorized signing officers. If a shareholder is itself a corporation, add it as an entity and look through it.",
+  charity: "Add all directors and authorized officers. Add controlling persons (≥25%). Look through any entity owners.",
+  trust: "Add all trustees (required — they control the trust), all beneficiaries, the settlor, and any protector. Assign each person a role. Look through any entity parties.",
+  ipp: "Add all trustees of the IPP/RCA. If the trustee is a corporation, add it as an entity and identify who controls that corporation.",
+  lp: "Add all partners and members. Record their ownership percentages (must total 100%). Look through any entity partners.",
+  estate: "Add all executors (they have signing authority) and all beneficiaries. Look through any entity executors.",
+  condo: "Add authorized signing officers and the strata/condo council resolution signatories.",
+  fund: "Add the general partner, fund manager, or trustee — whoever controls the fund. Look through to the controlling natural persons.",
+  union: "Add all authorized signing officers. Look through any entity controllers.",
+  fn: "Add the Chief and Council (or equivalent governing body members) and all authorized signing officers — the control test governs, not ownership %. A First Nation is a public body: beneficial-ownership look-through terminates here."
+};
+const S = { phase: "diagram", entityType: "", entityName: "", started: false, zoom: 100, status: "building" };
+
+function icon(name) {
+  const p = {
+    building: '<path d="M4 20V8l8-4 8 4v12"/><path d="M9 20v-6h6v6"/><path d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01"/>',
+    heart: '<path d="M12 19s-7-4.4-7-9a4 4 0 0 1 7-2 4 4 0 0 1 7 2c0 4.6-7 9-7 9z"/>',
+    columns: '<path d="M6 20V7M10 20V7M14 20V7M18 20V7M4 7h16M5 4h14"/>',
+    umbrella: '<path d="M12 4v16"/><path d="M12 4c-5 0-8 4-8 7h16c0-3-3-7-8-7z"/><path d="M12 20a2 2 0 0 0 2-2"/>',
+    hands: '<path d="M8 13l-2 2a2 2 0 0 0 3 3l2-2"/><path d="M16 13l2 2a2 2 0 0 1-3 3l-2-2"/><path d="M8 13V7a2 2 0 1 1 4 0v6"/><path d="M12 11V6a2 2 0 1 1 4 0v7"/>',
+    scroll: '<path d="M7 4h9a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V6a2 2 0 0 1 2-2z"/><path d="M7 4v13"/>',
+    condo: '<path d="M4 20V9l5-3v14"/><path d="M9 20V6l11-3v17"/><path d="M13 10h2M13 14h2M13 17h2"/>',
+    chart: '<path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 15v-4M12 15V8M16 15v-6"/>',
+    people: '<path d="M8 11a3 3 0 1 0-3-3 3 3 0 0 0 3 3zM16 11a3 3 0 1 0-3-3 3 3 0 0 0 3 3z"/><path d="M3 19a5 5 0 0 1 10 0M13 19a5 5 0 0 1 8 0"/>',
+    sun: '<circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"/>',
+    user: '<circle cx="12" cy="8" r="3"/><path d="M5 19a7 7 0 0 1 14 0"/>',
+    search: '<circle cx="11" cy="11" r="6"/><path d="m20 20-3.5-3.5"/>',
+    check: '<circle cx="12" cy="12" r="8"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
+    layers: '<path d="m12 3 8 4-8 4-8-4 8-4z"/><path d="m4 12 8 4 8-4"/><path d="m4 16 8 4 8-4"/>'
+  };
+  return `<svg class="ico" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${p[name] || ""}</svg>`;
+}
+const ICONS = { corp: "building", charity: "heart", trust: "columns", ipp: "umbrella", lp: "hands", estate: "scroll", condo: "condo", fund: "chart", union: "people", fn: "sun" };
+
+function esc(s) { return String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => t.classList.remove("show"), 2400);
+}
+function renderPhaseBar() {
+  const phases = [
+    { id: "diagram", label: "Ownership Structure" },
+    { id: "details", label: "Account Details" },
+    { id: "checklist", label: "Document Checklist" }
+  ];
+  const idx = phases.findIndex(p => p.id === S.phase);
+  document.getElementById("tb-badge").textContent = `Step ${idx + 1} of 3`;
+  document.getElementById("phase-bar").innerHTML = phases.map((p, i) => {
+    const done = i < idx;
+    const active = p.id === S.phase;
+    const cls = "ph" + (active ? " active" : "") + (done ? " done" : "");
+    const sep = i ? '<span class="ph-sep">›</span>' : "";
+    return `${sep}<button class="${cls}" type="button" onclick="goPhase('${p.id}')"><span class="ph-num">${done ? "✓" : i + 1}</span>${p.label}</button>`;
+  }).join("");
+}
+function defsHtml() {
+  const et = ET[S.entityType];
+  const tip = et
+    ? `<strong>${et.label} — CIRO Rule ${et.rule}</strong>${GUIDANCE[S.entityType]}`
+    : `<strong>Getting started</strong>Choose the entity type opening the account. Then add its owners and controllers until every branch ends with a named individual.`;
+  return `<aside class="defs-panel">
+    <div class="defs-head"><div class="defs-heading">Key Concepts</div></div>
+    <div class="def-card own" id="def-own"><div class="def-icon">${icon("user")}</div><div class="def-title">Ownership — ≥25%</div><div class="def-body">A person <strong>owns</strong> an entity when they hold <strong>25% or more</strong> of its shares, units, or interests — directly or through other entities they control.</div></div>
+    <div class="def-card ctrl" id="def-ctrl"><div class="def-icon">${icon("people")}</div><div class="def-title">Control</div><div class="def-body">A person <strong>controls</strong> an entity when they can direct its activities — even with less than 25% ownership. Examples: <strong>sole directors, trustees, managing partners, executors</strong>.</div></div>
+    <div class="def-card look" id="def-look"><div class="def-icon">${icon("search")}</div><div class="def-title">Look-Through Rule</div><div class="def-body">If an owner is itself an entity, <strong>keep looking</strong>. You must find the <strong>natural persons</strong> (human beings) who ultimately own or control it — every chain must end with a person.</div></div>
+    <div class="def-card done-c" id="def-done"><div class="def-icon">${icon("check")}</div><div class="def-title">When Are You Done?</div><div class="def-body">When every branch of the diagram ends with a <strong>person card</strong> (green), not an entity card (blue).</div></div>
+    <div class="def-card nffe"><div class="def-icon">${icon("layers")}</div><div class="def-title">Passive vs Active NFFE</div><div class="def-body">An <strong>NFFE</strong> (Non-Financial Foreign Entity) is any non-Canadian entity that is not a Financial Institution.<br><br><strong>Active NFFE</strong> — less than 50% of gross income is passive (dividends, interest, rent, royalties) <em>and</em> less than 50% of assets are held for passive income. Typical: an operating business.<br><br><strong>Passive NFFE</strong> — 50% or more of income is passive, or 50% or more of assets produce passive income. Typical: holding companies. Controlling persons with <strong>≥25% control</strong> must each complete an <strong>RC519</strong> certification.</div></div>
+    <hr class="defs-divider">
+    <div class="defs-tip">${tip}</div>
+  </aside>`;
+}
+function emptyHtml() {
+  const ready = S.entityType && S.entityName.trim();
+  const cards = Object.entries(ET).map(([k, v]) => `
+    <button class="etype ${S.entityType === k ? "sel" : ""}" type="button" onclick="pickType('${k}')">
+      <span class="etype-icon">${icon(ICONS[k])}</span>
+      <span class="etype-name">${esc(v.label)}</span>
+      <span class="etype-desc">${esc(v.desc)}</span>
+    </button>`).join("");
+  return `<div class="empty-diagram">
+    <div class="empty-icon">${icon("building").replace('width="20" height="20"', 'width="48" height="48"')}</div>
+    <div class="empty-title">Who is opening this account?</div>
+    <div class="empty-sub">Select the entity type, enter its name, and the ownership diagram will appear. You'll then add the people and entities that own or control it.</div>
+    <div class="empty-teaser">
+      <div class="empty-teaser-lead">Canadian AML rules (FINTRAC/CIRO) require this before the account can be opened:</div>
+      <button class="empty-teaser-btn" type="button" onclick="focusDef('own')"><span class="empty-teaser-icon">${icon("user")}</span><span>You must identify anyone who owns 25% or more.</span></button>
+      <button class="empty-teaser-btn" type="button" onclick="focusDef('ctrl')"><span class="empty-teaser-icon">${icon("people")}</span><span>You must identify anyone who controls the entity — even below 25%.</span></button>
+      <button class="empty-teaser-btn" type="button" onclick="focusDef('look')"><span class="empty-teaser-icon">${icon("search")}</span><span>If an owner is itself a company, look through it to the real people behind it.</span></button>
+    </div>
+    <div class="entity-grid">${cards}</div>
+    <div class="name-row"><input id="entity-name-input" placeholder="Enter the entity's legal name..." value="${esc(S.entityName)}" oninput="onName(this.value)" onkeydown="if (event.key==='Enter') startInterview()"></div>
+    <div class="start-row">
+      <button class="btn btn-primary" type="button" onclick="startInterview()" ${ready ? "" : "disabled"}>Answer a few questions →</button>
+      <button class="btn" type="button" onclick="startDiagram()" ${ready ? "" : "disabled"}>Build the diagram myself</button>
+    </div>
+    ${S.entityType && !S.entityName.trim() ? '<p class="name-hint">Enter the legal name to continue</p>' : ""}
+    <div class="or-divider"><hr><span>or let AI do it</span><hr></div>
+    <button class="btn" type="button" style="font-size:12px;padding:8px 20px" onclick="showModal('Parse formation documents', 'Upload PDFs or images. In the full guide, the assistant reads the documents and proposes an ownership structure for you to review.')">Parse Formation Documents with AI</button>
+    <p class="ai-note">Upload PDFs or images — the assistant reads the documents and proposes the ownership structure for your review</p>
+  </div>`;
+}
+function treeHtml() {
+  const et = ET[S.entityType];
+  return `<div class="tree-wrap"><div class="d-node"><span class="d-node-icon">${icon(ICONS[S.entityType] || "building")}</span><div><div class="d-node-name">${esc(S.entityName)}</div><div class="d-node-meta">${esc(et ? et.label : "Entity")} · root</div></div></div></div>`;
+}
+function footerHtml() {
+  const canContinue = S.started;
+  return `<footer class="diagram-footer">
+    <div class="zoom-ctrl">
+      <button type="button" onclick="changeZoom(-10)" aria-label="Zoom out">−</button>
+      <span class="zoom-label">${S.zoom}%</span>
+      <button type="button" onclick="changeZoom(10)" aria-label="Zoom in">+</button>
+      <button class="zoom-fit-btn" type="button" onclick="zoomFit()">Fit</button>
+    </div>
+    <div class="footer-actions">
+      <button class="btn btn-sm btn-ghost" type="button" onclick="focusDef('done')">What do I add?</button>
+      <button class="btn btn-sm btn-primary" type="button" onclick="goPhase('details')" ${canContinue ? "" : "disabled"} title="${canContinue ? "" : "Build the ownership structure first"}">Continue to Account Details →</button>
+    </div>
+  </footer>`;
+}
+function render() {
+  renderPhaseBar();
+  const shell = document.getElementById("shell");
+  if (S.phase === "details") {
+    shell.innerHTML = `<div class="diagram-canvas-wrap" style="display:block"><div class="placeholder"><h2>Account Details</h2><p>Jurisdiction, tax residency, and account profile go here, after the ownership diagram is in place.${S.entityName ? " Current entity: <strong>" + esc(S.entityName) + "</strong>." : ""}</p></div></div>`;
+    return;
+  }
+  if (S.phase === "checklist") {
+    shell.innerHTML = `<div class="diagram-canvas-wrap" style="display:block"><div class="placeholder"><h2>Document Checklist</h2><p>Formation documents, beneficial-ownership certifications, and tax forms are listed here once the entity type is known.</p></div></div>`;
+    return;
+  }
+  shell.innerHTML = defsHtml() + `<div class="work"><div class="diagram-canvas-wrap">${S.started ? treeHtml() : emptyHtml()}</div>${footerHtml()}</div>`;
+  const input = document.getElementById("entity-name-input");
+  if (input) {
+    input.focus();
+    const n = input.value.length;
+    input.setSelectionRange(n, n);
+  }
+}
+function pickType(k) { S.entityType = k; render(); }
+function onName(v) { S.entityName = v; render(); }
+function startInterview() {
+  if (!S.entityType || !S.entityName.trim()) return;
+  S.started = true;
+  toast("Guided questions start from the owners and controllers of " + S.entityName.trim());
+  render();
+}
+function startDiagram() {
+  if (!S.entityType || !S.entityName.trim()) return;
+  S.started = true;
+  render();
+}
+function goPhase(id) {
+  if (id === "details" && !S.started) { toast("Build the ownership structure first"); return; }
+  S.phase = id;
+  render();
+}
+function changeZoom(d) { S.zoom = Math.max(25, Math.min(150, S.zoom + d)); render(); }
+function zoomFit() { S.zoom = 100; render(); }
+function focusDef(id) {
+  const map = { own: "def-own", ctrl: "def-ctrl", look: "def-look", done: "def-done" };
+  const el = document.getElementById(map[id]);
+  if (!el) return;
+  el.scrollIntoView({ behavior: "smooth", block: "center" });
+  el.classList.remove("pulse");
+  void el.offsetWidth;
+  el.classList.add("pulse");
+}
+function toggleAssist() { document.getElementById("assist-drawer").classList.toggle("open"); }
+function sendAssist(e) {
+  e.preventDefault();
+  const input = document.getElementById("assist-input");
+  const text = input.value.trim();
+  if (!text) return;
+  const body = document.getElementById("assist-body");
+  body.insertAdjacentHTML("beforeend", `<div class="as-msg ai" style="align-self:flex-end;background:#5B3A8F;color:#fff">${esc(text)}</div>`);
+  const reply = S.entityType
+    ? `For a ${ET[S.entityType].label}, ${GUIDANCE[S.entityType]}`
+    : "Start by choosing the entity type on the left of the main panel, then enter its legal name.";
+  body.insertAdjacentHTML("beforeend", `<div class="as-msg ai">${esc(reply)}</div>`);
+  input.value = "";
+  body.scrollTop = body.scrollHeight;
+}
+function showModal(title, text) {
+  document.getElementById("modal-root").innerHTML = `<div class="overlay" onclick="if (event.target===this) closeModal()"><div class="modal"><h3>${esc(title)}</h3><p>${text}</p><div style="margin-top:16px;text-align:right"><button class="btn btn-primary" type="button" onclick="closeModal()">Close</button></div></div></div>`;
+}
+function closeModal() { document.getElementById("modal-root").innerHTML = ""; }
+function showAccounts() { showModal("Accounts", "No other saved accounts in this browser yet. Use Save to download this file, or Load to open one."); }
+function setStatus(v) { S.status = v; toast("Status set to " + v); }
+function saveProgress() {
+  const blob = new Blob([JSON.stringify(S, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = (S.entityName || "account").replace(/\s+/g, "-").toLowerCase() + ".ca.json";
+  a.click();
+}
+function loadProgress(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      Object.assign(S, data);
+      render();
+      toast("Account loaded");
+    } catch (err) { toast("Could not read that file"); }
+  };
+  reader.readAsText(file);
+}
+render();
+</script>
+<script>
+/* Enhanced local prototype. Business rules are demonstrative until Compliance approval. */
+Object.assign(S, {
+  schemaVersion: 2,
+  accountId: S.accountId || ("CA-" + Date.now().toString(36).toUpperCase()),
+  nodes: S.nodes || [],
+  details: S.details || { province: "", residency: "", features: [], trustedContact: "" },
+  checklist: S.checklist || {},
+  customRequirements: S.customRequirements || [],
+  audit: S.audit || []
+});
+
+const PROVINCES = ["AB — Alberta","BC — British Columbia","MB — Manitoba","NB — New Brunswick","NL — Newfoundland and Labrador","NS — Nova Scotia","NT — Northwest Territories","NU — Nunavut","ON — Ontario","PE — Prince Edward Island","QC — Quebec","SK — Saskatchewan","YT — Yukon"];
+const CHECK_RULES = [
+  { id:"naaf", section:"Entity Formation & Authorization", name:"New Account Application Form (NAAF)", required:()=>true, note:"Include CRA Business Number when applicable." },
+  { id:"formation", section:"Entity Formation & Authorization", name:"Articles / formation or governing document", required:()=>true },
+  { id:"resolution", section:"Entity Formation & Authorization", name:"Corporate resolution / signing authority evidence", required:s=>["corp","condo","charity","union","fn"].includes(s.entityType) },
+  { id:"bo", section:"Entity Formation & Authorization", name:"Beneficial Owner Identification", required:s=>["corp","lp","fund","trust","ipp"].includes(s.entityType), note:"CIRO/FINTRAC ownership and control record." },
+  { id:"directors", section:"Entity Formation & Authorization", name:"Director listing", required:s=>["corp","charity","condo"].includes(s.entityType) },
+  { id:"tcp", section:"Entity Formation & Authorization", name:"Trusted Contact Person form", required:s=>s.details.trustedContact==="yes", conditional:true },
+  { id:"margin", section:"Account Features", name:"Margin agreement", required:s=>s.details.features.includes("margin"), conditional:true },
+  { id:"options", section:"Account Features", name:"Options agreement and risk disclosure", required:s=>s.details.features.includes("options"), conditional:true },
+  { id:"dvp", section:"Account Features", name:"COD / DVP settlement instructions", required:s=>s.details.features.includes("dvp"), conditional:true },
+  { id:"fpl", section:"Account Features", name:"Fully Paid Lending disclosure", required:s=>s.details.features.includes("fpl"), conditional:true },
+  { id:"identity", section:"Persons to Identify (FINTRAC / CIRO)", name:"Identity verification for signing officers and controllers", required:s=>s.nodes.some(n=>n.kind==="person") },
+  { id:"pep", section:"Persons to Identify (FINTRAC / CIRO)", name:"PEP / HIO enhanced review", required:s=>s.nodes.some(n=>n.pep), conditional:true },
+  { id:"w9", section:"US — IRS / Withholding Tax Documentation", name:"W-9 for US person/entity", required:s=>s.details.residency==="us" || s.nodes.some(n=>n.usPerson), conditional:true },
+  { id:"w8", section:"US — IRS / Withholding Tax Documentation", name:"W-8BEN-E or applicable treaty statement", required:s=>s.details.residency && s.details.residency!=="canada" && s.details.residency!=="us", conditional:true },
+  { id:"rc519", section:"FATCA / CRS Self-Certification", name:"RC519 — Declaration of Tax Residence for Entities", required:s=>s.details.residency && s.details.residency!=="canada", conditional:true },
+  { id:"nffe", section:"FATCA / CRS Self-Certification", name:"Passive NFFE controlling-person certification", required:s=>s.details.residency==="international", conditional:true }
+];
+
+function uid() { return "n-" + Math.random().toString(36).slice(2,10); }
+function rootNode() { return S.nodes.find(n => !n.parentId); }
+function childrenOf(id) { return S.nodes.filter(n => n.parentId === id); }
+function entityIssues() {
+  if (!S.started || !rootNode()) return ["Create the root entity."];
+  const issues = [];
+  S.nodes.filter(n=>n.kind==="entity").forEach(n => {
+    const kids = childrenOf(n.id);
+    if (!kids.length) issues.push(`${n.name}: add at least one owner or controller.`);
+    const owned = kids.filter(k=>Number(k.ownership)>0).reduce((a,k)=>a+Number(k.ownership),0);
+    if (owned && Math.abs(owned-100)>.01) issues.push(`${n.name}: disclosed ownership totals ${owned}% (expected 100%).`);
+  });
+  return issues;
+}
+function detailsComplete() { return !!(S.details.province && S.details.residency && S.details.trustedContact); }
+function ensureRoot() {
+  if (!S.started || rootNode()) return;
+  S.nodes = [{ id:uid(), parentId:null, kind:"entity", entityType:S.entityType, name:S.entityName.trim(), ownership:100, control:true, usPerson:false, pep:false }];
+}
+const baseStartInterview = startInterview;
+startInterview = function() { baseStartInterview(); ensureRoot(); openOwnerModal(rootNode().id, "person"); };
+const baseStartDiagram = startDiagram;
+startDiagram = function() { baseStartDiagram(); ensureRoot(); render(); };
+
+function audit(action, outcome) { S.audit.push({ at: new Date().toLocaleTimeString(), action, outcome }); }
+function nodeHtml(n) {
+  const kids = childrenOf(n.id);
+  const openIssue = n.kind === "entity" && !kids.length;
+  const pill = n.pep ? ["warn","PEP / HIO"] : openIssue ? ["wait","Look-through"] : ["ok", n.kind === "person" ? "Identified" : "Verified"];
+  const meta = n.kind === "person"
+    ? `${n.country || "Country not set"} · ${n.ownership || 0}%${n.control ? " · controller" : ""}`
+    : `${ET[n.entityType]?.label || "Entity"}${n.parentId ? ` · ${n.ownership || 0}%` : " · root"}`;
+  const initials = esc(n.name).split(/\s+/).slice(0,2).map(part => part[0] || "").join("").toUpperCase();
+  return `<div class="tree-branch"><article class="party-card"><div class="who"><div class="avatar">${initials}</div><div><span class="pill ${pill[0]}">${pill[1]}</span><strong>${esc(n.name)}</strong><span class="meta">${esc(meta)}</span></div></div>
+    <div class="node-actions">${n.kind==="entity" ? `<button onclick="openOwnerModal('${n.id}','person')">+ Person</button><button onclick="openOwnerModal('${n.id}','entity')">+ Entity</button>` : ""}
+    ${n.parentId ? `<button onclick="removeNode('${n.id}')">Remove</button>` : ""}</div></article>
+    ${kids.length ? `<div class="tree-level">${kids.map(nodeHtml).join("")}</div>` : ""}</div>`;
+}
+function companyCheckHtml() {
+  const issues = S.started ? entityIssues() : ["Choose an entity to begin."];
+  const pep = S.nodes.filter(n => n.pep).length;
+  return `<section class="surface"><h3>Company Check</h3>
+    <div class="check-line"><span>Company status</span><b class="pill ${S.started ? "ok" : "wait"}">${S.started ? esc(ET[S.entityType]?.label || "Active") : "Not started"}</b></div>
+    <div class="check-line"><span>Ownership structure</span><b class="pill ${issues.length ? "wait" : "ok"}">${issues.length ? "Incomplete" : "Retrieved & verified"}</b></div>
+    <div class="check-line"><span>Watchlists</span><b class="pill ${pep ? "warn" : "ok"}">${pep ? pep + " PEP / HIO" : "No matches recorded"}</b></div>
+    <div class="check-line"><span>UBO verification</span><b class="pill wait">${S.nodes.filter(n => n.kind === "person").length} people</b></div>
+    <p class="concept">Ownership and control are separate tests. A person at or above 25% needs FINTRAC identification, and so does a signer or decision-maker below 25%.</p>
+  </section>`;
+}
+function contextHtml() {
+  const issues = S.started ? entityIssues() : ["Select an entity type and legal name before adding owners."];
+  const guidance = S.entityType ? GUIDANCE[S.entityType] : "Choose the entity type, then add owners and controllers until every branch ends with a natural person.";
+  return `<section class="surface"><h3>What this case still needs</h3>${issues.length ? issues.map(item => `<div class="check-line"><span>${esc(item)}</span></div>`).join("") : "<p class='concept'>The ownership gate is clear. Continue to account details.</p>"}<p class="concept"><b>${esc(ET[S.entityType]?.label || "Getting started")} · CIRO ${esc(ET[S.entityType]?.rule || "")}</b>${esc(guidance)}</p></section>
+    <section class="surface"><h3>AI suggestion</h3><p class="concept">Parse formation documents proposes an ownership tree. Staff must confirm every name, percentage, and controller before it is saved. AI does not decide PEP status or tax classification.</p><button class="btn btn-sm btn-primary" type="button" onclick="showModal('Parse formation documents','Upload PDFs or images. The assistant will propose owners, percentages, and controllers for review. Nothing is saved until you confirm each item.')">Parse Formation Documents</button></section>
+    <section class="surface"><h3>Audit</h3>${(S.audit || []).slice(-4).reverse().map(item => `<div class="check-line"><span>${esc(item.at)} · ${esc(item.action)}</span></div>`).join("") || "<p class='concept'>Actions will be recorded here.</p>"}</section>`;
+}
+treeHtml = function() {
+  ensureRoot();
+  const root = rootNode();
+  const issues = entityIssues();
+  return `${issues.length ? `<div class="warning-bar">${issues.map(esc).join("<br>")}</div>` : ""}
+    <div class="tree-stage" style="transform:scale(${S.zoom/100})"><div class="tree-level root">${root ? nodeHtml(root) : ""}</div></div>`;
+};
+function removeNode(id) {
+  const remove = new Set([id]); let changed = true;
+  while(changed){ changed=false; S.nodes.forEach(n=>{ if(n.parentId && remove.has(n.parentId) && !remove.has(n.id)){remove.add(n.id);changed=true;} }); }
+  S.nodes = S.nodes.filter(n=>!remove.has(n.id)); audit("Node removed", id); render();
+}
+function openOwnerModal(parentId, kind) {
+  const parent = S.nodes.find(n=>n.id===parentId);
+  const typeIcons = { corp:"🏢", charity:"♥️", trust:"🛡️", ipp:"🏛️", lp:"⚓", estate:"📜", condo:"🏘️", fund:"📊", union:"🕊️", fn:"🍂" };
+  const entityTypes = Object.entries(ET).map(([k,v],i)=>`<label class="entity-choice"><input type="radio" name="entityType" value="${k}" ${i===0?"checked":""}><span class="etype-mini-icon">${typeIcons[k]||"🏢"}</span>${esc(v.label)}</label>`).join("");
+  const ownershipUsed = childrenOf(parentId).reduce((sum,n)=>sum+Number(n.ownership||0),0);
+  const personFields = `
+    <div class="owner-field"><label>Full legal name</label><input name="name" placeholder="First and last name" required></div>
+    <div class="owner-field"><label>Country of residence</label><select name="country" required><option value="">— Select —</option><option>Canada</option><option>United States</option><option>United Kingdom</option><option>Australia</option><option>Other</option></select></div>
+    <div><span class="owner-label">US person?</span><div class="owner-card-grid">
+      <label class="owner-choice"><input type="radio" name="usPerson" value="false" checked><strong>NO</strong></label>
+      <label class="owner-choice"><input type="radio" name="usPerson" value="true"><strong>YES</strong><small>W-9 required</small></label>
+    </div></div>`;
+  const entityFields = `
+    <div class="owner-field"><label>Legal name</label><input name="name" placeholder="Legal entity name" required></div>
+    <div><span class="owner-label">Entity type</span><div class="entity-types">${entityTypes}</div></div>
+    <div><span class="owner-label">US tax classification</span><div class="owner-card-grid tax">
+      <label class="owner-choice tax-choice"><input type="radio" name="usTaxClass" value="complex"><strong>COMPLEX</strong><small>Taxed at trust level — W-8BEN-E</small></label>
+      <label class="owner-choice tax-choice"><input type="radio" name="usTaxClass" value="simple"><strong>SIMPLE / GRANTOR</strong><small>Flow-through — W-8IMY + withholding stmt</small></label>
+      <label class="owner-choice tax-choice"><input type="radio" name="usTaxClass" value="unsure" checked><strong>NOT SURE</strong><small>Both listed until confirmed</small></label>
+    </div></div>
+    <div><span class="owner-label">US entity?</span><div class="owner-card-grid">
+      <label class="owner-choice"><input type="radio" name="usPerson" value="false" checked><strong>NO</strong><small>W-8 series</small></label>
+      <label class="owner-choice"><input type="radio" name="usPerson" value="true"><strong>YES</strong><small>US-incorporated — W-9 required</small></label>
+    </div></div>`;
+  document.getElementById("modal-root").innerHTML = `<div class="overlay"><div class="modal owner-modal">
+    <h3>Add Owner / Controller</h3><p class="owner-sub">Who owns or controls ${esc(parent?.name || "this entity")}?</p>
+    <div class="owner-tabs"><button type="button" class="${kind==="person"?"sel":""}" onclick="openOwnerModal('${parentId}','person')">♟&nbsp; Individual person</button><button type="button" class="${kind==="entity"?"sel":""}" onclick="openOwnerModal('${parentId}','entity')">🏢&nbsp; Another entity</button></div>
+    <div class="owner-info"><b>i</b><span>${kind==="person"?"A natural person — a human being who owns or controls this entity.":"An intermediate entity — you will need to look through it and identify who owns or controls it."}</span></div>
+    <form class="owner-form" onsubmit="addOwner(event,'${parentId}','${kind}')">
+      ${kind==="person"?personFields:entityFields}
+      <div><span class="owner-label">Ownership %</span><div class="ownership-row"><input name="ownership" type="number" min="0" max="100" step=".01" value="100" required oninput="updateOwnerTally(${ownershipUsed},this.value)"><span>%</span></div>
+        <div class="owner-tally"><div id="owner-total" class="ok">✓ Owners will total ${ownershipUsed+100}%</div><div class="fintrac">♧ ≥25% effective ownership — this ${kind==="person"?"person":"entity"} will need FINTRAC identification</div></div>
+      </div>
+      <div><span class="owner-label">Person with control</span><label class="owner-check"><input name="control" type="checkbox"><strong>Has signing authority or directs decisions</strong><small>E.g. sole director, authorized officer — requires FINTRAC ID regardless of ownership %</small></label></div>
+      ${kind==="person"?`<div><span class="owner-label">PEP / HIO</span><label class="owner-check plain"><input name="pep" type="checkbox"><strong>Politically exposed person or head of international organization</strong><small>Triggers the AML risk assessment and enhanced due diligence on the checklist</small></label></div>`:""}
+      <div class="owner-actions"><button class="btn" type="button" onclick="closeModal()">Cancel</button><button class="btn btn-primary">Add to diagram →</button></div>
+    </form>
+  </div></div>`;
+}
+function updateOwnerTally(used,value) {
+  const total=used+(Number(value)||0), el=document.getElementById("owner-total");
+  if(!el)return; el.textContent=(Math.abs(total-100)<.01?"✓":"△")+" Owners will total "+total+"%"; el.className=total===100?"ok":"";
+}
+function addOwner(e,parentId,kind) {
+  e.preventDefault(); const f = new FormData(e.target);
+  S.nodes.push({ id:uid(), parentId, kind, name:String(f.get("name")).trim(), entityType:kind==="entity"?String(f.get("entityType")):"", country:String(f.get("country")||""), ownership:Number(f.get("ownership")), usPerson:f.get("usPerson")==="true", usTaxClass:String(f.get("usTaxClass")||""), control:f.get("control")==="on", pep:f.get("pep")==="on" });
+  audit(kind === "person" ? "Person added" : "Entity added", String(f.get("name")).trim());
+  closeModal(); render();
+}
+function detailsHtml() {
+  const issues = entityIssues();
+  const choices = [["canada","Canadian resident"],["us","US person involved"],["international","International / non-Canadian"],["mixed","Mixed / unclear"]];
+  const features = [["margin","Margin account"],["options","Options trading"],["dvp","COD / DVP account"],["fpl","Fully Paid Lending"]];
+  return `<div class="diagram-canvas-wrap" style="display:block"><div class="form-page">
+    ${issues.length?`<div class="warning-bar">Ownership structure is incomplete: ${issues.map(esc).join(" ")}</div>`:""}
+    <div class="form-card"><h3>Province & tax residency</h3><label>Province / territory of establishment</label><select onchange="setDetail('province',this.value)"><option value="">Select…</option>${PROVINCES.map(p=>`<option ${S.details.province===p.slice(0,2)?"selected":""} value="${p.slice(0,2)}">${p}</option>`).join("")}</select>
+    <div style="margin-top:13px"><label>Tax residency of the entity</label><div class="choice-grid">${choices.map(([v,l])=>`<label class="choice"><input type="radio" name="residency" value="${v}" ${S.details.residency===v?"checked":""} onchange="setDetail('residency',this.value)">${l}</label>`).join("")}</div></div></div>
+    <div class="form-card"><h3>Account features</h3><div class="choice-grid">${features.map(([v,l])=>`<label class="choice"><input type="checkbox" ${S.details.features.includes(v)?"checked":""} onchange="toggleFeature('${v}',this.checked)">${l}</label>`).join("")}</div></div>
+    <div class="form-card"><h3>Compliance questions</h3>${S.nodes.some(n=>n.pep)?`<div class="warning-bar">At least one person is flagged as PEP / HIO. Enhanced review will be added to the checklist.</div>`:""}
+    <label>Will the client designate a trusted contact person?</label><div class="choice-grid">${[["yes","Yes — form required"],["no","No — form not required"]].map(([v,l])=>`<label class="choice"><input type="radio" name="tcp" value="${v}" ${S.details.trustedContact===v?"checked":""} onchange="setDetail('trustedContact',this.value)">${l}</label>`).join("")}</div></div>
+    <div class="page-actions"><button class="btn" onclick="goPhase('diagram')">← Back to Diagram</button><button class="btn btn-primary" ${detailsComplete()?"":"disabled"} onclick="goPhase('checklist')">Generate Checklist →</button></div>
+  </div></div>`;
+}
+function setDetail(k,v){ S.details[k]=v; render(); }
+function toggleFeature(v,on){ S.details.features = on ? [...new Set([...S.details.features,v])] : S.details.features.filter(x=>x!==v); render(); }
+function activeRequirements() {
+  const base = CHECK_RULES.filter(r=>r.required(S));
+  return base.concat(S.customRequirements.map((r,i)=>({id:"custom-"+i,section:"Additional Requirements",name:r,required:()=>true,conditional:true})));
+}
+function checklistHtml() {
+  const reqs=activeRequirements(), done=reqs.filter(r=>S.checklist[r.id]).length, pct=reqs.length?Math.round(done/reqs.length*100):0;
+  const sections=[...new Set(reqs.map(r=>r.section))];
+  return `<div class="diagram-canvas-wrap" style="display:block"><div class="form-page">
+    <div class="check-head"><div><h2 style="font-size:18px">Document Checklist — ${esc(S.entityName)}</h2><p style="font-size:11px;color:#777">${esc(S.accountId)} · Demonstration rules pending Compliance approval</p></div><div><strong>${done} of ${reqs.length}</strong><div class="progress-track" style="width:150px"><div class="progress-fill" style="width:${pct}%"></div></div></div></div>
+    ${sections.map(sec=>{const items=reqs.filter(r=>r.section===sec);return `<section class="check-section"><h3><span>${esc(sec)}</span><span>${items.filter(r=>!r.conditional).length} required · ${items.filter(r=>r.conditional).length} conditional</span></h3>${items.map(r=>`<label class="check-item"><input type="checkbox" ${S.checklist[r.id]?"checked":""} onchange="setChecked('${r.id}',this.checked)"><span>${r.conditional?'<span class="conditional">IF APPLICABLE</span><br>':""}${esc(r.name)}${r.note?`<small>${esc(r.note)}</small>`:""}</span></label>`).join("")}</section>`}).join("")}
+    <section class="surface" style="margin-top:12px"><h3>Audit trail</h3><p class="concept">Rule version demo-2026-10-04. These rules are demonstrative until Compliance approval.</p>${(S.audit||[]).slice(-8).reverse().map(item=>`<div class="check-line"><span>${esc(item.at)}</span><b>${esc(item.action)}</b></div>`).join("")}</section>
+    <div class="page-actions no-print"><button class="btn" onclick="goPhase('details')">← Back to Account Details</button><span><button class="btn" onclick="addGeneric()">+ Add Generic</button> <button class="btn" onclick="window.print()">Print Checklist</button> <button class="btn btn-primary" onclick="markReady()">Ready for compliance</button></span></div>
+  </div></div>`;
+}
+function setChecked(id,on){S.checklist[id]=on;audit(on?"Document collected":"Document cleared",id);render();}
+function markReady(){const missing=activeRequirements().filter(r=>!S.checklist[r.id]);if(missing.length){toast("Collect every checklist item first");return;}S.status="ready";audit("Ready for compliance","All requirements collected");render();}
+function addGeneric(){const name=prompt("Additional document requirement");if(name&&name.trim()){S.customRequirements.push(name.trim());render();}}
+
+const originalRender = render;
+render = function() {
+  renderPhaseBar();
+  document.getElementById("tb-status").value=S.status;
+  const shell=document.getElementById("shell");
+  if(S.phase==="details"){shell.innerHTML=detailsHtml();return;}
+  if(S.phase==="checklist"){if(!detailsComplete()){S.phase="details";shell.innerHTML=detailsHtml();toast("Complete account details first");return;}shell.innerHTML=checklistHtml();return;}
+  shell.innerHTML=`<div class="case-layout"><aside class="rail">${companyCheckHtml()}<section class="surface concept" id="def-own"><b>Ownership — 25% or more</b>A person who owns this much, directly or through other entities, needs FINTRAC identification.</section><section class="surface concept" id="def-ctrl"><b>Control</b>Directors, trustees, executors, and signing officers are identified even below 25%.</section><section class="surface concept" id="def-look"><b>Look-through</b>Keep opening entity owners until the branch ends with a person. For a First Nation, the chain stops at its governing body.</section><section class="surface concept" id="def-done"><b>Ownership gate</b>Every entity has an owner or controller, and disclosed percentages total 100%.</section></aside><div class="work"><div class="diagram-canvas-wrap">${S.started?treeHtml():emptyHtml()}</div>${footerHtml()}</div><aside class="rail">${contextHtml()}</aside></div>`;
+};
+goPhase = function(id) {
+  if(id==="details" && !S.started){toast("Build the ownership structure first");return;}
+  if(id==="checklist" && !detailsComplete()){toast("Complete account details first");return;}
+  S.phase=id;render();
+};
+footerHtml = function() {
+  const issues=entityIssues(), canContinue=S.started && issues.length===0;
+  return `<footer class="diagram-footer"><div>${issues.length?`<span style="font-size:11px;color:#9a5b00">${issues.length} structure issue(s)</span>`:"<span style='font-size:11px;color:#1D9E75'>Ownership structure complete</span>"}</div><div class="footer-actions">
+  <div class="zoom-ctrl"><button onclick="changeZoom(-10)">−</button><span class="zoom-label">${S.zoom}%</span><button onclick="changeZoom(10)">+</button><button class="zoom-fit-btn" onclick="zoomFit()">Fit</button></div>
+  <button class="btn btn-sm" onclick="if(confirm('Reset this account?')) resetAccount()">Reset</button><button class="btn btn-sm" onclick="showBOSummary()">BO Tally</button><button class="btn btn-sm btn-primary" onclick="goPhase('details')" ${canContinue?"":"disabled"}>Continue →</button></div></footer>`;
+};
+function resetAccount(){S.nodes=[];S.started=false;S.details={province:"",residency:"",features:[],trustedContact:""};S.checklist={};S.phase="diagram";render();}
+function showBOSummary(){const ps=S.nodes.filter(n=>n.kind==="person");showModal("Beneficial Owner Summary",ps.length?ps.map(p=>`${esc(p.name)} — ${p.ownership||0}%${p.control?" — controller":""}`).join("<br>"):"No people added yet.");}
+showModal = function(title,text){document.getElementById("modal-root").innerHTML=`<div class="overlay" onclick="if(event.target===this)closeModal()"><div class="modal"><h3>${esc(title)}</h3><p>${text}</p><div style="margin-top:16px;text-align:right"><button class="btn btn-primary" onclick="closeModal()">Close</button></div></div></div>`;};
+saveProgress = function(){const blob=new Blob([JSON.stringify(S,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=(S.entityName||"account").replace(/\s+/g,"-").toLowerCase()+".ca.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};
+loadProgress = function(input){const file=input.files&&input.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const d=JSON.parse(reader.result);if(!d||typeof d!=="object"||!["diagram","details","checklist"].includes(d.phase))throw new Error("Invalid schema");Object.assign(S,d);S.nodes=Array.isArray(d.nodes)?d.nodes:[];S.details=Object.assign({province:"",residency:"",features:[],trustedContact:""},d.details||{});S.checklist=d.checklist&&typeof d.checklist==="object"?d.checklist:{};S.customRequirements=Array.isArray(d.customRequirements)?d.customRequirements:[];render();toast("Account loaded");}catch(e){toast("Could not read that file");}};reader.readAsText(file);input.value="";};
+render();
+</script>
+</body>
+</html>

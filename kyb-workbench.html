@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Complex Account Workbench</title>
+<style>
+  :root {
+    --bg: #f4f6fb;
+    --ink: #1b2430;
+    --muted: #6d7785;
+    --line: #e6eaf1;
+    --blue: #3d6fe0;
+    --blue-soft: #eaf1ff;
+    --green: #178a4b;
+    --green-soft: #e8f8ee;
+    --amber: #b7791f;
+    --amber-soft: #fff6e4;
+    --card: #fff;
+    --shadow: 0 10px 30px rgba(28, 39, 68, .08);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.45 Inter, ui-sans-serif, system-ui, sans-serif; color: var(--ink); background: var(--bg); }
+  button, input, select { font: inherit; }
+  button { cursor: pointer; }
+  .top { height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 28px; background: rgba(255,255,255,.86); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 5; backdrop-filter: blur(10px); }
+  .brand { display: flex; gap: 10px; align-items: center; font-weight: 750; }
+  .mark { width: 28px; height: 28px; border-radius: 8px; background: #172033; color: #fff; display: grid; place-items: center; font-size: 13px; }
+  .brand small, .case-meta small { display: block; color: var(--muted); font-weight: 500; font-size: 11px; }
+  .top-actions { display: flex; gap: 8px; }
+  .btn { border: 1px solid #d9dfeb; background: #fff; border-radius: 10px; padding: 8px 12px; font-weight: 650; }
+  .btn.primary { background: #172033; color: #fff; border-color: #172033; }
+  .page { width: min(1180px, calc(100% - 40px)); margin: 28px auto 50px; }
+  .case-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 22px; }
+  h1 { font-size: 28px; margin: 0 0 4px; letter-spacing: -.03em; }
+  .steps { display: flex; gap: 18px; margin: 8px 0 26px; }
+  .step { display: flex; align-items: center; gap: 8px; color: #98a2b3; background: none; border: 0; padding: 0; font-weight: 650; }
+  .step i { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; border: 1.5px solid #d5dbe6; font-style: normal; font-size: 11px; }
+  .step.active { color: var(--ink); }
+  .step.active i, .step.done i { background: #178a4b; color: #fff; border-color: #178a4b; }
+  .layout { display: grid; grid-template-columns: 280px 1fr 300px; gap: 18px; align-items: start; }
+  .view[hidden] { display: none; }
+  .card { background: var(--card); border: 1px solid rgba(255,255,255,.7); border-radius: 18px; box-shadow: var(--shadow); }
+  .party { padding: 14px; display: flex; gap: 10px; align-items: center; width: 100%; text-align: left; border: 1px solid transparent; }
+  .party.selected { outline: 2px solid #c9d8fb; }
+  .avatar, .entity-icon { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: #eef2f7; flex: 0 0 auto; overflow: hidden; }
+  .entity-icon { border-radius: 12px; }
+  .party strong, .party span { display: block; }
+  .party span, .sub { color: var(--muted); font-size: 12px; }
+  .pill { display: inline-flex; border-radius: 999px; padding: 3px 8px; font-size: 11px; font-weight: 750; }
+  .processing { color: #315fc7; background: var(--blue-soft); }
+  .approved { color: var(--green); background: var(--green-soft); }
+  .requested { color: var(--amber); background: var(--amber-soft); }
+  .tree { position: relative; display: grid; gap: 12px; padding: 8px 0 8px 28px; }
+  .tree:before { content: ""; position: absolute; left: 8px; top: 24px; bottom: 24px; border-left: 1.5px dotted #c5cedd; }
+  .check-card, .detail, .panel { padding: 16px; }
+  .check-card h2, .panel h2 { font-size: 16px; margin: 0 0 12px; }
+  .check-row { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-top: 1px solid var(--line); font-size: 13px; }
+  .check-row:first-of-type { border-top: 0; }
+  .ok { color: var(--green); font-weight: 700; }
+  .portrait { height: 210px; border-radius: 16px; background: linear-gradient(160deg, #d9e4f5, #f7f1e8 55%, #e7eef8); display: grid; place-items: end start; padding: 16px; position: relative; overflow: hidden; }
+  .portrait:before { content: ""; position: absolute; width: 120px; height: 120px; border-radius: 50%; background: #f0d2b8; right: 54px; top: 34px; }
+  .portrait:after { content: ""; position: absolute; width: 150px; height: 90px; border-radius: 80px 80px 20px 20px; background: #6ea8d8; right: 40px; bottom: 28px; }
+  .portrait div { position: relative; z-index: 1; background: rgba(255,255,255,.92); border-radius: 12px; padding: 8px 10px; }
+  .portrait strong, .portrait span { display: block; }
+  .stack { display: grid; gap: 14px; }
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  label { display: grid; gap: 5px; font-size: 12px; font-weight: 700; color: #526073; }
+  input, select { border: 1px solid #dbe1ec; border-radius: 10px; padding: 9px 10px; background: #fff; }
+  .choice { border: 1px solid #e1e6ef; border-radius: 12px; padding: 10px; display: flex; gap: 8px; align-items: center; font-weight: 650; }
+  .doc { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); }
+  .doc small { display: block; }
+  .audit { display: grid; grid-template-columns: 70px 1.3fr .8fr 1fr; gap: 8px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 12px; }
+  .audit b { font-weight: 650; }
+  @media (max-width: 980px) { .layout, .fields, .audit { grid-template-columns: 1fr; } .page { width: min(100% - 24px, 760px); } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><div class="mark">F</div><div>Complex Account Workbench<small>WI / PI internal KYB case</small></div></div>
+  <div class="top-actions"><button class="btn">Save draft</button><button class="btn primary">Request review</button></div>
+</header>
+<main class="page">
+  <div class="case-head">
+    <div><h1 id="title">Northwind Community Foundation</h1><div class="case-meta"><small id="subtitle">Charity · CA-4F92 · Processing</small></div></div>
+  </div>
+  <nav class="steps" aria-label="Case steps">
+    <button class="step active" data-step="ownership"><i>1</i>Ownership</button>
+    <button class="step" data-step="details"><i>2</i>Account details</button>
+    <button class="step" data-step="documents"><i>3</i>Documents</button>
+    <button class="step" data-step="review"><i>4</i>Review</button>
+  </nav>
+  <section id="ownership" class="layout view">
+    <div class="stack">
+      <button class="card party selected" data-party="root"><div class="entity-icon">▣</div><div><strong>Northwind Community Foundation</strong><span class="pill processing">Processing</span> <span>Company</span></div></button>
+      <article class="card check-card">
+        <h2>Company Check</h2>
+        <div class="check-row"><span>Company status</span><b class="ok">Active</b></div>
+        <div class="check-row"><span>Ownership structure</span><b class="ok">Retrieved & verified</b></div>
+        <div class="check-row"><span>Watchlists</span><b class="ok">No matches found</b></div>
+        <div class="check-row"><span>UBO verification</span><b class="pill processing">Processing</b></div>
+      </article>
+    </div>
+    <div class="tree">
+      <button class="card party" data-party="ann"><div class="avatar">AJ</div><div><span class="pill approved">Approved</span><strong>Ann Grace Jones</strong><span>🇨🇦 Director</span></div></button>
+      <button class="card party" data-party="green"><div class="entity-icon">▣</div><div><span class="pill processing">Processing</span><strong>Green Harbour Holdings Ltd</strong><span>Control · 100%</span></div></button>
+      <button class="card party" data-party="gabriel"><div class="avatar">GM</div><div><span class="pill approved">Approved</span><strong>Gabriel Moreau</strong><span>🇫🇷 Representative</span></div></button>
+    </div>
+    <article class="card detail" id="person-card"></article>
+  </section>
+  <section id="details" class="view" hidden>
+    <div class="card panel"><h2>Account details</h2><div class="fields"><label>Province<select><option>Ontario</option><option>British Columbia</option><option>Quebec</option></select></label><label>Tax residency<select><option>Canadian resident</option><option>US person involved</option><option>International</option></select></label></div><div class="fields" style="margin-top:12px"><label class="choice"><input type="checkbox"> Margin</label><label class="choice"><input type="checkbox"> Options</label><label class="choice"><input type="checkbox"> Trusted contact designated</label><label class="choice"><input type="checkbox" checked> PEP / HIO review required</label></div></div>
+  </section>
+  <section id="documents" class="view" hidden>
+    <div class="card panel"><h2>Required documents</h2><div class="doc"><span><b>Formation documents</b><small class="sub">Governing document for the charity</small></span><span class="pill approved">Received</span></div><div class="doc"><span><b>Director resolution</b><small class="sub">Signing authority</small></span><span class="pill processing">Requested</span></div><div class="doc"><span><b>Identity — Diego Martinez</b><small class="sub">UBO of Green Harbour Holdings Ltd</small></span><span class="pill requested">KYC requested</span></div><div class="doc"><span><b>RC519</b><small class="sub">Shown because tax residency is international</small></span><span class="pill processing">Conditional</span></div></div>
+  </section>
+  <section id="review" class="view" hidden>
+    <div class="card panel"><h2>Audit trail</h2><div class="audit"><b>09:14</b><span>Case created</span><span>WI advisor</span><span>Draft saved</span></div><div class="audit"><b>09:22</b><span>Ownership proposed from formation PDF</span><span>Document AI</span><span>Awaiting confirmation</span></div><div class="audit"><b>09:31</b><span>PEP flag — Diego Martinez</span><span>Staff entry</span><span>Enhanced review added</span></div><div class="audit"><b>09:36</b><span>Checklist generated</span><span>Rule demo-2026-10-04</span><span>4 requirements</span></div></div>
+  </section>
+</main>
+<script>
+const people = {
+  root: ["Northwind Community Foundation", "Charity · root entity", "Company profile is active. Ownership is confirmed and UBO verification is still processing."],
+  ann: ["Ann Grace Jones", "Director · Canada · Approved", "Identity and director authority have been accepted."],
+  green: ["Green Harbour Holdings Ltd", "Intermediate entity · 100% control", "This company must be looked through to its natural person."],
+  gabriel: ["Gabriel Moreau", "Representative · France · Approved", "Authorized representative. No watchlist match."],
+  diego: ["Diego Martinez", "UBO · Spain · KYC requested", "Owns Green Harbour Holdings Ltd through the control chain. Enhanced due diligence is required."]
+};
+function renderPerson(id) {
+  const [name, meta, text] = people[id];
+  document.getElementById("person-card").innerHTML = `<div class="portrait"><div><strong>${name}</strong><span class="sub">${meta}</span></div></div><h2 style="margin:14px 0 6px">${name}</h2><p class="sub">${text}</p><p><span class="pill ${id === "diego" ? "requested" : "approved"}">${id === "diego" ? "KYC Requested" : "Ready"}</span></p>`;
+}
+document.getElementById("person-card").insertAdjacentHTML("beforeend", "");
+renderPerson("diego");
+document.querySelectorAll("[data-party]").forEach((button) => button.addEventListener("click", () => {
+  document.querySelectorAll("[data-party]").forEach((item) => item.classList.remove("selected"));
+  button.classList.add("selected");
+  renderPerson(button.dataset.party === "green" ? "diego" : button.dataset.party);
+}));
+document.querySelectorAll(".step").forEach((step) => step.addEventListener("click", () => {
+  document.querySelectorAll(".step").forEach((item, index) => { item.classList.toggle("active", item === step); item.classList.toggle("done", index < [...document.querySelectorAll(".step")].indexOf(step)); });
+  document.querySelectorAll(".view").forEach((view) => view.hidden = view.id !== step.dataset.step);
+}));
+</script>
+</body>
+</html>

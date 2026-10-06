@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AccountCase {
+  id             String     @id @default(cuid())
+  version        Int        @default(1)
+  legalName      String
+  entityType     String
+  status         String     @default("BUILDING")
+  ruleVersion    String
+  parties        Json
+  profile        Json?
+  checklist      Json       @default("{}")
+  createdBy      String
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  documents      Document[]
+  auditEvents    AuditEvent[]
+
+  @@index([status, updatedAt])
+  @@index([legalName])
+}
+
+model Document {
+  id          String      @id @default(cuid())
+  accountId   String
+  requirementId String
+  fileName    String
+  contentType String
+  objectKey   String
+  sizeBytes   Int
+  sha256      String
+  scanStatus  String      @default("PENDING")
+  uploadedBy  String
+  createdAt   DateTime    @default(now())
+  account     AccountCase @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId, requirementId])
+}
+
+model AuditEvent {
+  id          String      @id @default(cuid())
+  accountId   String
+  actorId     String
+  action      String
+  before      Json?
+  after       Json?
+  createdAt   DateTime    @default(now())
+  account     AccountCase @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId, createdAt])
+}

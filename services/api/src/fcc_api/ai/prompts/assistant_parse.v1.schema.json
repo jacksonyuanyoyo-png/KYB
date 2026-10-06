@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "proposal": {
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "legalName": { "type": "string" },
+            "ownershipPercent": { "type": "number", "minimum": 0, "maximum": 100 },
+            "title": { "type": "string" },
+            "isController": { "type": "boolean" },
+            "isSigningAuthority": { "type": "boolean" },
+            "isUsPerson": { "type": "boolean" },
+            "isPepHio": { "type": "boolean" },
+            "parentName": { "type": ["string", "null"] }
+          }
+        }
+      ]
+    }
+  }
+}

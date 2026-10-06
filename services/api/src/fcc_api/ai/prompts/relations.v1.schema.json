@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["entities", "relations"],
+  "properties": {
+    "entities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["tempKey", "kind", "legalName", "confidence", "pageNo", "quote"],
+        "properties": {
+          "tempKey": { "type": "string" },
+          "kind": { "enum": ["PERSON", "ENTITY"] },
+          "legalName": { "type": "string" },
+          "entityType": { "type": ["string", "null"] },
+          "title": { "type": ["string", "null"] },
+          "country": { "type": ["string", "null"] },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "pageNo": { "type": "integer", "minimum": 1 },
+          "quote": { "type": "string", "maxLength": 240 }
+        }
+      }
+    },
+    "relations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["relationType", "fromTempKey", "toTempKey", "confidence", "pageNo", "quote"],
+        "properties": {
+          "relationType": {
+            "enum": [
+              "OWNS",
+              "CONTROLS",
+              "SIGNS",
+              "DIRECTOR_OF",
+              "TRUSTEE_OF",
+              "BENEFICIARY_OF",
+              "OFFICER_OF"
+            ]
+          },
+          "fromTempKey": { "type": "string" },
+          "toTempKey": { "type": "string" },
+          "ownershipPercent": { "type": ["number", "null"] },
+          "shares": { "type": ["number", "null"] },
+          "totalShares": { "type": ["number", "null"] },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "pageNo": { "type": "integer", "minimum": 1 },
+          "quote": { "type": "string", "maxLength": 240 }
+        }
+      }
+    }
+  }
+}

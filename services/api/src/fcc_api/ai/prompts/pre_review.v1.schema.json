@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["severity", "quote", "pageNo"],
+        "properties": {
+          "severity": { "enum": ["high", "medium", "low"] },
+          "title": { "type": "string" },
+          "detail": { "type": "string" },
+          "quote": { "type": "string", "maxLength": 240 },
+          "pageNo": { "type": "integer", "minimum": 1 },
+          "requirementId": { "type": "string" }
+        }
+      }
+    }
+  }
+}

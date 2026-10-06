@@ -1,0 +1,2586 @@
+{
+  "generatedFrom": "packages/domain/src/index.test.ts",
+  "seedGeneratedFrom": "apps/web/lib/data/seed.ts",
+  "builtinVersion": "demo-2026-10-04",
+  "cases": [
+    {
+      "id": "P-01",
+      "name": "accepts a fully disclosed ownership structure",
+      "fn": "validateOwnership",
+      "input": {
+        "id": "case-1",
+        "version": 1,
+        "legalName": "Maple Holdings Inc.",
+        "entityType": "corporation",
+        "status": "BUILDING",
+        "ruleVersion": "demo",
+        "createdAt": "2026-10-04T00:00:00.000Z",
+        "updatedAt": "2026-10-04T00:00:00.000Z",
+        "parties": [
+          {
+            "id": "root",
+            "parentId": null,
+            "kind": "ENTITY",
+            "legalName": "Maple Holdings Inc.",
+            "entityType": "corporation",
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": true,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "person",
+            "parentId": "root",
+            "kind": "PERSON",
+            "legalName": "Alice Chen",
+            "entityType": null,
+            "country": "Canada",
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": true,
+            "isSigningAuthority": true,
+            "isUsPerson": false,
+            "isPepHio": false
+          }
+        ],
+        "profile": {
+          "province": "ON",
+          "taxResidency": "CANADA",
+          "features": [
+            "MARGIN"
+          ],
+          "trustedContact": false
+        }
+      },
+      "expected": []
+    },
+    {
+      "id": "P-02",
+      "name": "adds account-feature requirements",
+      "fn": "generateRequirements",
+      "input": {
+        "id": "case-1",
+        "version": 1,
+        "legalName": "Maple Holdings Inc.",
+        "entityType": "corporation",
+        "status": "BUILDING",
+        "ruleVersion": "demo",
+        "createdAt": "2026-10-04T00:00:00.000Z",
+        "updatedAt": "2026-10-04T00:00:00.000Z",
+        "parties": [
+          {
+            "id": "root",
+            "parentId": null,
+            "kind": "ENTITY",
+            "legalName": "Maple Holdings Inc.",
+            "entityType": "corporation",
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": true,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "person",
+            "parentId": "root",
+            "kind": "PERSON",
+            "legalName": "Alice Chen",
+            "entityType": null,
+            "country": "Canada",
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": true,
+            "isSigningAuthority": true,
+            "isUsPerson": false,
+            "isPepHio": false
+          }
+        ],
+        "profile": {
+          "province": "ON",
+          "taxResidency": "CANADA",
+          "features": [
+            "MARGIN"
+          ],
+          "trustedContact": false
+        }
+      },
+      "expected": [
+        {
+          "id": "naaf",
+          "section": "Entity Formation & Authorization",
+          "name": "New Account Application Form (NAAF)",
+          "conditional": false,
+          "source": "FCC guide §5.2",
+          "reason": "Required for every new account. Include the CRA Business Number when applicable.",
+          "partyIds": []
+        },
+        {
+          "id": "formation",
+          "section": "Entity Formation & Authorization",
+          "name": "Articles / formation or governing document",
+          "conditional": false,
+          "source": "FCC guide §3",
+          "reason": "Confirms the entity exists and who governs it.",
+          "partyIds": []
+        },
+        {
+          "id": "resolution",
+          "section": "Entity Formation & Authorization",
+          "name": "Corporate resolution / signing authority evidence",
+          "conditional": false,
+          "source": "FCC guide §5.2",
+          "reason": "Entity type acts through a board or governing body.",
+          "partyIds": [
+            "person"
+          ]
+        },
+        {
+          "id": "beneficial-owner",
+          "section": "Entity Formation & Authorization",
+          "name": "Beneficial Owner Identification",
+          "conditional": false,
+          "source": "CIRO 3203–3204; Compliance approval required",
+          "reason": "CIRO/FINTRAC ownership and control record.",
+          "partyIds": [
+            "person"
+          ]
+        },
+        {
+          "id": "directors",
+          "section": "Entity Formation & Authorization",
+          "name": "Director listing",
+          "conditional": false,
+          "source": "FCC guide",
+          "reason": "This entity type is governed by a board of directors.",
+          "partyIds": []
+        },
+        {
+          "id": "identity",
+          "section": "Persons to Identify",
+          "name": "Identity verification for signers and controllers",
+          "conditional": false,
+          "source": "FINTRAC; Compliance approval required",
+          "reason": "Persons with ≥25% ownership, control or signing authority must be identified.",
+          "partyIds": [
+            "person"
+          ]
+        },
+        {
+          "id": "margin",
+          "section": "Account Features",
+          "name": "Margin agreement",
+          "conditional": true,
+          "source": "FCC guide §5.2",
+          "reason": "Margin feature selected.",
+          "partyIds": []
+        }
+      ]
+    },
+    {
+      "id": "P-03",
+      "name": "identifies indirect owners at or above 25% and controllers below it",
+      "fn": "personsToIdentify",
+      "input": {
+        "parties": [
+          {
+            "id": "root",
+            "parentId": null,
+            "kind": "ENTITY",
+            "legalName": "Maple Holdings Inc.",
+            "entityType": "corporation",
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": true,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "holdco",
+            "parentId": "root",
+            "kind": "ENTITY",
+            "legalName": "Holdco",
+            "entityType": "corporation",
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 50,
+            "isController": false,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "bob",
+            "parentId": "holdco",
+            "kind": "PERSON",
+            "legalName": "Bob",
+            "entityType": null,
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 60,
+            "isController": false,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "carol",
+            "parentId": "holdco",
+            "kind": "PERSON",
+            "legalName": "Carol",
+            "entityType": null,
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 40,
+            "isController": false,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "dan",
+            "parentId": "root",
+            "kind": "PERSON",
+            "legalName": "Dan",
+            "entityType": null,
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 50,
+            "isController": false,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "erin",
+            "parentId": "root",
+            "kind": "PERSON",
+            "legalName": "Erin",
+            "entityType": null,
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 0,
+            "isController": false,
+            "isSigningAuthority": true,
+            "isUsPerson": false,
+            "isPepHio": false
+          }
+        ]
+      },
+      "expected": [
+        "bob",
+        "dan",
+        "erin"
+      ]
+    },
+    {
+      "id": "P-03b",
+      "name": "effective ownership multiplied down the chain",
+      "fn": "effectiveOwnership",
+      "input": {
+        "parties": [
+          {
+            "id": "root",
+            "parentId": null,
+            "kind": "ENTITY",
+            "legalName": "Maple Holdings Inc.",
+            "entityType": "corporation",
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": true,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "holdco",
+            "parentId": "root",
+            "kind": "ENTITY",
+            "legalName": "Holdco",
+            "entityType": "corporation",
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 50,
+            "isController": false,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "bob",
+            "parentId": "holdco",
+            "kind": "PERSON",
+            "legalName": "Bob",
+            "entityType": null,
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 60,
+            "isController": false,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "carol",
+            "parentId": "holdco",
+            "kind": "PERSON",
+            "legalName": "Carol",
+            "entityType": null,
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 40,
+            "isController": false,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "dan",
+            "parentId": "root",
+            "kind": "PERSON",
+            "legalName": "Dan",
+            "entityType": null,
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 50,
+            "isController": false,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "erin",
+            "parentId": "root",
+            "kind": "PERSON",
+            "legalName": "Erin",
+            "entityType": null,
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 0,
+            "isController": false,
+            "isSigningAuthority": true,
+            "isUsPerson": false,
+            "isPepHio": false
+          }
+        ]
+      },
+      "expected": {
+        "root": 100,
+        "holdco": 50,
+        "bob": 30,
+        "carol": 20,
+        "dan": 50,
+        "erin": 0
+      }
+    },
+    {
+      "id": "P-04",
+      "name": "links identity requirements to the persons that trigger them",
+      "fn": "identityPartyIds",
+      "input": {
+        "id": "case-1",
+        "version": 1,
+        "legalName": "Maple Holdings Inc.",
+        "entityType": "corporation",
+        "status": "BUILDING",
+        "ruleVersion": "demo",
+        "createdAt": "2026-10-04T00:00:00.000Z",
+        "updatedAt": "2026-10-04T00:00:00.000Z",
+        "parties": [
+          {
+            "id": "root",
+            "parentId": null,
+            "kind": "ENTITY",
+            "legalName": "Maple Holdings Inc.",
+            "entityType": "corporation",
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": true,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "person",
+            "parentId": "root",
+            "kind": "PERSON",
+            "legalName": "Alice Chen",
+            "entityType": null,
+            "country": "Canada",
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": true,
+            "isSigningAuthority": true,
+            "isUsPerson": false,
+            "isPepHio": false
+          }
+        ],
+        "profile": {
+          "province": "ON",
+          "taxResidency": "CANADA",
+          "features": [
+            "MARGIN"
+          ],
+          "trustedContact": false
+        }
+      },
+      "expected": [
+        "person"
+      ]
+    },
+    {
+      "id": "P-05a",
+      "name": "tax residency CANADA",
+      "fn": "generateRequirements",
+      "input": {
+        "id": "case-1",
+        "version": 1,
+        "legalName": "Maple Holdings Inc.",
+        "entityType": "corporation",
+        "status": "BUILDING",
+        "ruleVersion": "demo",
+        "createdAt": "2026-10-04T00:00:00.000Z",
+        "updatedAt": "2026-10-04T00:00:00.000Z",
+        "parties": [
+          {
+            "id": "root",
+            "parentId": null,
+            "kind": "ENTITY",
+            "legalName": "Maple Holdings Inc.",
+            "entityType": "corporation",
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": true,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "person",
+            "parentId": "root",
+            "kind": "PERSON",
+            "legalName": "Alice Chen",
+            "entityType": null,
+            "country": "Canada",
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": true,
+            "isSigningAuthority": true,
+            "isUsPerson": false,
+            "isPepHio": false
+          }
+        ],
+        "profile": {
+          "province": "ON",
+          "taxResidency": "CANADA",
+          "features": [
+            "MARGIN"
+          ],
+          "trustedContact": false
+        }
+      },
+      "expected": [
+        {
+          "id": "naaf",
+          "section": "Entity Formation & Authorization",
+          "name": "New Account Application Form (NAAF)",
+          "conditional": false,
+          "source": "FCC guide §5.2",
+          "reason": "Required for every new account. Include the CRA Business Number when applicable.",
+          "partyIds": []
+        },
+        {
+          "id": "formation",
+          "section": "Entity Formation & Authorization",
+          "name": "Articles / formation or governing document",
+          "conditional": false,
+          "source": "FCC guide §3",
+          "reason": "Confirms the entity exists and who governs it.",
+          "partyIds": []
+        },
+        {
+          "id": "resolution",
+          "section": "Entity Formation & Authorization",
+          "name": "Corporate resolution / signing authority evidence",
+          "conditional": false,
+          "source": "FCC guide §5.2",
+          "reason": "Entity type acts through a board or governing body.",
+          "partyIds": [
+            "person"
+          ]
+        },
+        {
+          "id": "beneficial-owner",
+          "section": "Entity Formation & Authorization",
+          "name": "Beneficial Owner Identification",
+          "conditional": false,
+          "source": "CIRO 3203–3204; Compliance approval required",
+          "reason": "CIRO/FINTRAC ownership and control record.",
+          "partyIds": [
+            "person"
+          ]
+        },
+        {
+          "id": "directors",
+          "section": "Entity Formation & Authorization",
+          "name": "Director listing",
+          "conditional": false,
+          "source": "FCC guide",
+          "reason": "This entity type is governed by a board of directors.",
+          "partyIds": []
+        },
+        {
+          "id": "identity",
+          "section": "Persons to Identify",
+          "name": "Identity verification for signers and controllers",
+          "conditional": false,
+          "source": "FINTRAC; Compliance approval required",
+          "reason": "Persons with ≥25% ownership, control or signing authority must be identified.",
+          "partyIds": [
+            "person"
+          ]
+        },
+        {
+          "id": "margin",
+          "section": "Account Features",
+          "name": "Margin agreement",
+          "conditional": true,
+          "source": "FCC guide §5.2",
+          "reason": "Margin feature selected.",
+          "partyIds": []
+        }
+      ]
+    },
+    {
+      "id": "P-05b",
+      "name": "tax residency US",
+      "fn": "generateRequirements",
+      "input": {
+        "id": "case-1",
+        "version": 1,
+        "legalName": "Maple Holdings Inc.",
+        "entityType": "corporation",
+        "status": "BUILDING",
+        "ruleVersion": "demo",
+        "createdAt": "2026-10-04T00:00:00.000Z",
+        "updatedAt": "2026-10-04T00:00:00.000Z",
+        "parties": [
+          {
+            "id": "root",
+            "parentId": null,
+            "kind": "ENTITY",
+            "legalName": "Maple Holdings Inc.",
+            "entityType": "corporation",
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": true,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "person",
+            "parentId": "root",
+            "kind": "PERSON",
+            "legalName": "Alice Chen",
+            "entityType": null,
+            "country": "Canada",
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": true,
+            "isSigningAuthority": true,
+            "isUsPerson": false,
+            "isPepHio": false
+          }
+        ],
+        "profile": {
+          "province": "ON",
+          "taxResidency": "US",
+          "features": [
+            "MARGIN"
+          ],
+          "trustedContact": false
+        }
+      },
+      "expected": [
+        {
+          "id": "naaf",
+          "section": "Entity Formation & Authorization",
+          "name": "New Account Application Form (NAAF)",
+          "conditional": false,
+          "source": "FCC guide §5.2",
+          "reason": "Required for every new account. Include the CRA Business Number when applicable.",
+          "partyIds": []
+        },
+        {
+          "id": "formation",
+          "section": "Entity Formation & Authorization",
+          "name": "Articles / formation or governing document",
+          "conditional": false,
+          "source": "FCC guide §3",
+          "reason": "Confirms the entity exists and who governs it.",
+          "partyIds": []
+        },
+        {
+          "id": "resolution",
+          "section": "Entity Formation & Authorization",
+          "name": "Corporate resolution / signing authority evidence",
+          "conditional": false,
+          "source": "FCC guide §5.2",
+          "reason": "Entity type acts through a board or governing body.",
+          "partyIds": [
+            "person"
+          ]
+        },
+        {
+          "id": "beneficial-owner",
+          "section": "Entity Formation & Authorization",
+          "name": "Beneficial Owner Identification",
+          "conditional": false,
+          "source": "CIRO 3203–3204; Compliance approval required",
+          "reason": "CIRO/FINTRAC ownership and control record.",
+          "partyIds": [
+            "person"
+          ]
+        },
+        {
+          "id": "directors",
+          "section": "Entity Formation & Authorization",
+          "name": "Director listing",
+          "conditional": false,
+          "source": "FCC guide",
+          "reason": "This entity type is governed by a board of directors.",
+          "partyIds": []
+        },
+        {
+          "id": "identity",
+          "section": "Persons to Identify",
+          "name": "Identity verification for signers and controllers",
+          "conditional": false,
+          "source": "FINTRAC; Compliance approval required",
+          "reason": "Persons with ≥25% ownership, control or signing authority must be identified.",
+          "partyIds": [
+            "person"
+          ]
+        },
+        {
+          "id": "margin",
+          "section": "Account Features",
+          "name": "Margin agreement",
+          "conditional": true,
+          "source": "FCC guide §5.2",
+          "reason": "Margin feature selected.",
+          "partyIds": []
+        },
+        {
+          "id": "w9",
+          "section": "IRS / Withholding Tax",
+          "name": "W-9",
+          "conditional": true,
+          "source": "FCC guide §5.2",
+          "reason": "US tax residency or a US person in the structure.",
+          "partyIds": []
+        },
+        {
+          "id": "rc519",
+          "section": "FATCA / CRS",
+          "name": "RC519 Declaration of Tax Residence",
+          "conditional": true,
+          "source": "FCC guide §5.2",
+          "reason": "Tax residency is outside Canada.",
+          "partyIds": []
+        }
+      ]
+    },
+    {
+      "id": "P-05c",
+      "name": "tax residency MIXED",
+      "fn": "generateRequirements",
+      "input": {
+        "id": "case-1",
+        "version": 1,
+        "legalName": "Maple Holdings Inc.",
+        "entityType": "corporation",
+        "status": "BUILDING",
+        "ruleVersion": "demo",
+        "createdAt": "2026-10-04T00:00:00.000Z",
+        "updatedAt": "2026-10-04T00:00:00.000Z",
+        "parties": [
+          {
+            "id": "root",
+            "parentId": null,
+            "kind": "ENTITY",
+            "legalName": "Maple Holdings Inc.",
+            "entityType": "corporation",
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": true,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "person",
+            "parentId": "root",
+            "kind": "PERSON",
+            "legalName": "Alice Chen",
+            "entityType": null,
+            "country": "Canada",
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": true,
+            "isSigningAuthority": true,
+            "isUsPerson": false,
+            "isPepHio": false
+          }
+        ],
+        "profile": {
+          "province": "ON",
+          "taxResidency": "MIXED",
+          "features": [
+            "MARGIN"
+          ],
+          "trustedContact": false
+        }
+      },
+      "expected": [
+        {
+          "id": "naaf",
+          "section": "Entity Formation & Authorization",
+          "name": "New Account Application Form (NAAF)",
+          "conditional": false,
+          "source": "FCC guide §5.2",
+          "reason": "Required for every new account. Include the CRA Business Number when applicable.",
+          "partyIds": []
+        },
+        {
+          "id": "formation",
+          "section": "Entity Formation & Authorization",
+          "name": "Articles / formation or governing document",
+          "conditional": false,
+          "source": "FCC guide §3",
+          "reason": "Confirms the entity exists and who governs it.",
+          "partyIds": []
+        },
+        {
+          "id": "resolution",
+          "section": "Entity Formation & Authorization",
+          "name": "Corporate resolution / signing authority evidence",
+          "conditional": false,
+          "source": "FCC guide §5.2",
+          "reason": "Entity type acts through a board or governing body.",
+          "partyIds": [
+            "person"
+          ]
+        },
+        {
+          "id": "beneficial-owner",
+          "section": "Entity Formation & Authorization",
+          "name": "Beneficial Owner Identification",
+          "conditional": false,
+          "source": "CIRO 3203–3204; Compliance approval required",
+          "reason": "CIRO/FINTRAC ownership and control record.",
+          "partyIds": [
+            "person"
+          ]
+        },
+        {
+          "id": "directors",
+          "section": "Entity Formation & Authorization",
+          "name": "Director listing",
+          "conditional": false,
+          "source": "FCC guide",
+          "reason": "This entity type is governed by a board of directors.",
+          "partyIds": []
+        },
+        {
+          "id": "identity",
+          "section": "Persons to Identify",
+          "name": "Identity verification for signers and controllers",
+          "conditional": false,
+          "source": "FINTRAC; Compliance approval required",
+          "reason": "Persons with ≥25% ownership, control or signing authority must be identified.",
+          "partyIds": [
+            "person"
+          ]
+        },
+        {
+          "id": "margin",
+          "section": "Account Features",
+          "name": "Margin agreement",
+          "conditional": true,
+          "source": "FCC guide §5.2",
+          "reason": "Margin feature selected.",
+          "partyIds": []
+        },
+        {
+          "id": "w8",
+          "section": "IRS / Withholding Tax",
+          "name": "W-8BEN-E or applicable treaty statement",
+          "conditional": true,
+          "source": "FCC guide §5.2",
+          "reason": "International or mixed tax residency.",
+          "partyIds": []
+        },
+        {
+          "id": "rc519",
+          "section": "FATCA / CRS",
+          "name": "RC519 Declaration of Tax Residence",
+          "conditional": true,
+          "source": "FCC guide §5.2",
+          "reason": "Tax residency is outside Canada.",
+          "partyIds": []
+        }
+      ]
+    },
+    {
+      "id": "P-05d",
+      "name": "tax residency INTERNATIONAL",
+      "fn": "generateRequirements",
+      "input": {
+        "id": "case-1",
+        "version": 1,
+        "legalName": "Maple Holdings Inc.",
+        "entityType": "corporation",
+        "status": "BUILDING",
+        "ruleVersion": "demo",
+        "createdAt": "2026-10-04T00:00:00.000Z",
+        "updatedAt": "2026-10-04T00:00:00.000Z",
+        "parties": [
+          {
+            "id": "root",
+            "parentId": null,
+            "kind": "ENTITY",
+            "legalName": "Maple Holdings Inc.",
+            "entityType": "corporation",
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": true,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "person",
+            "parentId": "root",
+            "kind": "PERSON",
+            "legalName": "Alice Chen",
+            "entityType": null,
+            "country": "Canada",
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": true,
+            "isSigningAuthority": true,
+            "isUsPerson": false,
+            "isPepHio": false
+          }
+        ],
+        "profile": {
+          "province": "ON",
+          "taxResidency": "INTERNATIONAL",
+          "features": [
+            "MARGIN"
+          ],
+          "trustedContact": false
+        }
+      },
+      "expected": [
+        {
+          "id": "naaf",
+          "section": "Entity Formation & Authorization",
+          "name": "New Account Application Form (NAAF)",
+          "conditional": false,
+          "source": "FCC guide §5.2",
+          "reason": "Required for every new account. Include the CRA Business Number when applicable.",
+          "partyIds": []
+        },
+        {
+          "id": "formation",
+          "section": "Entity Formation & Authorization",
+          "name": "Articles / formation or governing document",
+          "conditional": false,
+          "source": "FCC guide §3",
+          "reason": "Confirms the entity exists and who governs it.",
+          "partyIds": []
+        },
+        {
+          "id": "resolution",
+          "section": "Entity Formation & Authorization",
+          "name": "Corporate resolution / signing authority evidence",
+          "conditional": false,
+          "source": "FCC guide §5.2",
+          "reason": "Entity type acts through a board or governing body.",
+          "partyIds": [
+            "person"
+          ]
+        },
+        {
+          "id": "beneficial-owner",
+          "section": "Entity Formation & Authorization",
+          "name": "Beneficial Owner Identification",
+          "conditional": false,
+          "source": "CIRO 3203–3204; Compliance approval required",
+          "reason": "CIRO/FINTRAC ownership and control record.",
+          "partyIds": [
+            "person"
+          ]
+        },
+        {
+          "id": "directors",
+          "section": "Entity Formation & Authorization",
+          "name": "Director listing",
+          "conditional": false,
+          "source": "FCC guide",
+          "reason": "This entity type is governed by a board of directors.",
+          "partyIds": []
+        },
+        {
+          "id": "identity",
+          "section": "Persons to Identify",
+          "name": "Identity verification for signers and controllers",
+          "conditional": false,
+          "source": "FINTRAC; Compliance approval required",
+          "reason": "Persons with ≥25% ownership, control or signing authority must be identified.",
+          "partyIds": [
+            "person"
+          ]
+        },
+        {
+          "id": "margin",
+          "section": "Account Features",
+          "name": "Margin agreement",
+          "conditional": true,
+          "source": "FCC guide §5.2",
+          "reason": "Margin feature selected.",
+          "partyIds": []
+        },
+        {
+          "id": "w8",
+          "section": "IRS / Withholding Tax",
+          "name": "W-8BEN-E or applicable treaty statement",
+          "conditional": true,
+          "source": "FCC guide §5.2",
+          "reason": "International or mixed tax residency.",
+          "partyIds": []
+        },
+        {
+          "id": "rc519",
+          "section": "FATCA / CRS",
+          "name": "RC519 Declaration of Tax Residence",
+          "conditional": true,
+          "source": "FCC guide §5.2",
+          "reason": "Tax residency is outside Canada.",
+          "partyIds": []
+        },
+        {
+          "id": "nffe",
+          "section": "FATCA / CRS",
+          "name": "Passive NFFE controlling-person certification",
+          "conditional": true,
+          "source": "FCC guide",
+          "reason": "International residency. If the entity is a passive NFFE, each controlling person at or above 25% certifies.",
+          "partyIds": [
+            "person"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P-05e",
+      "name": "entity type trust",
+      "fn": "generateRequirements",
+      "input": {
+        "id": "case-1",
+        "version": 1,
+        "legalName": "Maple Holdings Inc.",
+        "entityType": "trust",
+        "status": "BUILDING",
+        "ruleVersion": "demo",
+        "createdAt": "2026-10-04T00:00:00.000Z",
+        "updatedAt": "2026-10-04T00:00:00.000Z",
+        "parties": [
+          {
+            "id": "root",
+            "parentId": null,
+            "kind": "ENTITY",
+            "legalName": "Maple Holdings Inc.",
+            "entityType": "corporation",
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": true,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "person",
+            "parentId": "root",
+            "kind": "PERSON",
+            "legalName": "Alice Chen",
+            "entityType": null,
+            "country": "Canada",
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": true,
+            "isSigningAuthority": true,
+            "isUsPerson": false,
+            "isPepHio": false
+          }
+        ],
+        "profile": {
+          "province": "ON",
+          "taxResidency": "CANADA",
+          "features": [
+            "MARGIN"
+          ],
+          "trustedContact": false
+        }
+      },
+      "expected": [
+        {
+          "id": "naaf",
+          "section": "Entity Formation & Authorization",
+          "name": "New Account Application Form (NAAF)",
+          "conditional": false,
+          "source": "FCC guide §5.2",
+          "reason": "Required for every new account. Include the CRA Business Number when applicable.",
+          "partyIds": []
+        },
+        {
+          "id": "formation",
+          "section": "Entity Formation & Authorization",
+          "name": "Articles / formation or governing document",
+          "conditional": false,
+          "source": "FCC guide §3",
+          "reason": "Confirms the entity exists and who governs it.",
+          "partyIds": []
+        },
+        {
+          "id": "beneficial-owner",
+          "section": "Entity Formation & Authorization",
+          "name": "Beneficial Owner Identification",
+          "conditional": false,
+          "source": "CIRO 3203–3204; Compliance approval required",
+          "reason": "CIRO/FINTRAC ownership and control record.",
+          "partyIds": [
+            "person"
+          ]
+        },
+        {
+          "id": "identity",
+          "section": "Persons to Identify",
+          "name": "Identity verification for signers and controllers",
+          "conditional": false,
+          "source": "FINTRAC; Compliance approval required",
+          "reason": "Persons with ≥25% ownership, control or signing authority must be identified.",
+          "partyIds": [
+            "person"
+          ]
+        },
+        {
+          "id": "margin",
+          "section": "Account Features",
+          "name": "Margin agreement",
+          "conditional": true,
+          "source": "FCC guide §5.2",
+          "reason": "Margin feature selected.",
+          "partyIds": []
+        }
+      ]
+    },
+    {
+      "id": "P-06",
+      "name": "complete profile",
+      "fn": "validateProfile",
+      "input": {
+        "profile": {
+          "province": "ON",
+          "taxResidency": "CANADA",
+          "features": [
+            "MARGIN"
+          ],
+          "trustedContact": false
+        }
+      },
+      "expected": []
+    },
+    {
+      "id": "P-07",
+      "name": "empty province",
+      "fn": "validateProfile",
+      "input": {
+        "profile": {
+          "province": "",
+          "taxResidency": "CANADA",
+          "features": [
+            "MARGIN"
+          ],
+          "trustedContact": false
+        }
+      },
+      "expected": [
+        {
+          "code": "PROFILE_INCOMPLETE",
+          "message": "Province or territory of registration is required."
+        }
+      ]
+    },
+    {
+      "id": "P-07",
+      "name": "missing profile",
+      "fn": "validateProfile",
+      "input": {
+        "profile": null
+      },
+      "expected": [
+        {
+          "code": "PROFILE_INCOMPLETE",
+          "message": "Province or territory of registration is required."
+        }
+      ]
+    },
+    {
+      "id": "P-08",
+      "name": "ownership total renders like JavaScript String",
+      "fn": "validateOwnership",
+      "input": {
+        "id": "case-1",
+        "version": 1,
+        "legalName": "Maple Holdings Inc.",
+        "entityType": "corporation",
+        "status": "BUILDING",
+        "ruleVersion": "demo",
+        "createdAt": "2026-10-04T00:00:00.000Z",
+        "updatedAt": "2026-10-04T00:00:00.000Z",
+        "parties": [
+          {
+            "id": "root",
+            "parentId": null,
+            "kind": "ENTITY",
+            "legalName": "Maple Holdings Inc.",
+            "entityType": "corporation",
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": true,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "person",
+            "parentId": "root",
+            "kind": "PERSON",
+            "legalName": "Alice Chen",
+            "entityType": null,
+            "country": "Canada",
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 60,
+            "isController": true,
+            "isSigningAuthority": true,
+            "isUsPerson": false,
+            "isPepHio": false
+          }
+        ],
+        "profile": {
+          "province": "ON",
+          "taxResidency": "CANADA",
+          "features": [
+            "MARGIN"
+          ],
+          "trustedContact": false
+        }
+      },
+      "expected": [
+        {
+          "code": "OWNERSHIP_TOTAL",
+          "partyId": "root",
+          "message": "Maple Holdings Inc. ownership totals 60%."
+        }
+      ]
+    },
+    {
+      "id": "P-09",
+      "name": "missing root",
+      "fn": "validateOwnership",
+      "input": {
+        "parties": []
+      },
+      "expected": [
+        {
+          "code": "MISSING_ROOT",
+          "message": "A root entity is required."
+        }
+      ]
+    }
+  ],
+  "seedCases": [
+    {
+      "id": "S-01",
+      "caseId": "case-0139",
+      "input": {
+        "id": "case-0139",
+        "legalName": "Maple Ridge Holdings Inc.",
+        "entityType": "corporation",
+        "status": "DOCS_REQUESTED",
+        "parties": [
+          {
+            "id": "mr-root",
+            "parentId": null,
+            "kind": "ENTITY",
+            "legalName": "Maple Ridge Holdings Inc.",
+            "entityType": "corporation",
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": false,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "mr-alice",
+            "parentId": "mr-root",
+            "kind": "PERSON",
+            "legalName": "Alice Chen",
+            "entityType": null,
+            "country": "Canada",
+            "title": "Director",
+            "usTaxClass": null,
+            "ownershipPercent": 40,
+            "isController": true,
+            "isSigningAuthority": true,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "mr-harbour",
+            "parentId": "mr-root",
+            "kind": "ENTITY",
+            "legalName": "Harbourview Capital Ltd.",
+            "entityType": "corporation",
+            "country": "Canada",
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 35,
+            "isController": false,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "mr-raj",
+            "parentId": "mr-harbour",
+            "kind": "PERSON",
+            "legalName": "Raj Patel",
+            "entityType": null,
+            "country": "Canada",
+            "title": "Shareholder",
+            "usTaxClass": null,
+            "ownershipPercent": 70,
+            "isController": false,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "mr-mei",
+            "parentId": "mr-harbour",
+            "kind": "PERSON",
+            "legalName": "Mei Lin",
+            "entityType": null,
+            "country": "United States",
+            "title": "Shareholder",
+            "usTaxClass": null,
+            "ownershipPercent": 30,
+            "isController": false,
+            "isSigningAuthority": false,
+            "isUsPerson": true,
+            "isPepHio": false
+          },
+          {
+            "id": "mr-david",
+            "parentId": "mr-root",
+            "kind": "PERSON",
+            "legalName": "David Okoye",
+            "entityType": null,
+            "country": "Canada",
+            "title": "Officer",
+            "usTaxClass": null,
+            "ownershipPercent": 25,
+            "isController": false,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": true
+          }
+        ],
+        "profile": {
+          "province": "ON",
+          "taxResidency": "MIXED",
+          "features": [
+            "MARGIN",
+            "OPTIONS"
+          ],
+          "trustedContact": true,
+          "trustedContactName": "Helen Chen"
+        },
+        "ruleVersion": "demo-2026-10-04",
+        "checklist": {
+          "naaf": {
+            "status": "VERIFIED",
+            "documentIds": [
+              "d-1"
+            ]
+          },
+          "formation": {
+            "status": "RECEIVED",
+            "documentIds": [
+              "d-2"
+            ]
+          },
+          "resolution": {
+            "status": "RECEIVED",
+            "documentIds": [
+              "d-4"
+            ]
+          },
+          "margin": {
+            "status": "RECEIVED",
+            "documentIds": [
+              "d-5"
+            ]
+          },
+          "beneficial-owner": {
+            "status": "REQUESTED",
+            "documentIds": []
+          },
+          "identity": {
+            "status": "REQUESTED",
+            "documentIds": []
+          },
+          "pep": {
+            "status": "REQUESTED",
+            "documentIds": []
+          },
+          "w9": {
+            "status": "REQUESTED",
+            "documentIds": []
+          },
+          "rc519": {
+            "status": "REQUESTED",
+            "documentIds": []
+          }
+        },
+        "customRequirements": [],
+        "tasks": []
+      },
+      "expected": {
+        "ownershipIssues": [],
+        "detailsGaps": [],
+        "checklist": [
+          {
+            "id": "naaf",
+            "section": "Entity Formation & Authorization",
+            "name": "New Account Application Form (NAAF)",
+            "conditional": false,
+            "source": "FCC guide §5.2",
+            "reason": "Required for every new account. Include the CRA Business Number when applicable.",
+            "partyIds": [],
+            "custom": false
+          },
+          {
+            "id": "formation",
+            "section": "Entity Formation & Authorization",
+            "name": "Articles / formation or governing document",
+            "conditional": false,
+            "source": "FCC guide §3",
+            "reason": "Confirms the entity exists and who governs it.",
+            "partyIds": [],
+            "custom": false
+          },
+          {
+            "id": "resolution",
+            "section": "Entity Formation & Authorization",
+            "name": "Corporate resolution / signing authority evidence",
+            "conditional": false,
+            "source": "FCC guide §5.2",
+            "reason": "Entity type acts through a board or governing body.",
+            "partyIds": [
+              "mr-alice"
+            ],
+            "custom": false
+          },
+          {
+            "id": "beneficial-owner",
+            "section": "Entity Formation & Authorization",
+            "name": "Beneficial Owner Identification",
+            "conditional": false,
+            "source": "CIRO 3203–3204; Compliance approval required",
+            "reason": "CIRO/FINTRAC ownership and control record.",
+            "partyIds": [
+              "mr-alice",
+              "mr-david"
+            ],
+            "custom": false
+          },
+          {
+            "id": "directors",
+            "section": "Entity Formation & Authorization",
+            "name": "Director listing",
+            "conditional": false,
+            "source": "FCC guide",
+            "reason": "This entity type is governed by a board of directors.",
+            "partyIds": [],
+            "custom": false
+          },
+          {
+            "id": "identity",
+            "section": "Persons to Identify",
+            "name": "Identity verification for signers and controllers",
+            "conditional": false,
+            "source": "FINTRAC; Compliance approval required",
+            "reason": "Persons with ≥25% ownership, control or signing authority must be identified.",
+            "partyIds": [
+              "mr-alice",
+              "mr-david"
+            ],
+            "custom": false
+          },
+          {
+            "id": "pep",
+            "section": "Persons to Identify",
+            "name": "PEP / HIO enhanced review",
+            "conditional": true,
+            "source": "FINTRAC; Compliance approval required",
+            "reason": "At least one person is flagged as PEP / HIO.",
+            "partyIds": [
+              "mr-david"
+            ],
+            "custom": false
+          },
+          {
+            "id": "margin",
+            "section": "Account Features",
+            "name": "Margin agreement",
+            "conditional": true,
+            "source": "FCC guide §5.2",
+            "reason": "Margin feature selected.",
+            "partyIds": [],
+            "custom": false
+          },
+          {
+            "id": "options",
+            "section": "Account Features",
+            "name": "Options agreement and risk disclosure",
+            "conditional": true,
+            "source": "FCC guide §5.2",
+            "reason": "Options feature selected.",
+            "partyIds": [],
+            "custom": false
+          },
+          {
+            "id": "tcp",
+            "section": "Entity Formation & Authorization",
+            "name": "Trusted Contact Person form",
+            "conditional": true,
+            "source": "Compliance approval required",
+            "reason": "A Trusted Contact Person was designated.",
+            "partyIds": [],
+            "custom": false
+          },
+          {
+            "id": "w9",
+            "section": "IRS / Withholding Tax",
+            "name": "W-9",
+            "conditional": true,
+            "source": "FCC guide §5.2",
+            "reason": "US tax residency or a US person in the structure.",
+            "partyIds": [
+              "mr-mei"
+            ],
+            "custom": false
+          },
+          {
+            "id": "w8",
+            "section": "IRS / Withholding Tax",
+            "name": "W-8BEN-E or applicable treaty statement",
+            "conditional": true,
+            "source": "FCC guide §5.2",
+            "reason": "International or mixed tax residency.",
+            "partyIds": [],
+            "custom": false
+          },
+          {
+            "id": "rc519",
+            "section": "FATCA / CRS",
+            "name": "RC519 Declaration of Tax Residence",
+            "conditional": true,
+            "source": "FCC guide §5.2",
+            "reason": "Tax residency is outside Canada.",
+            "partyIds": [],
+            "custom": false
+          }
+        ],
+        "collected": 4,
+        "stage": "DOCUMENTS",
+        "blocker": "9 documents outstanding",
+        "openTasks": 0,
+        "identify": [
+          "mr-alice",
+          "mr-david"
+        ],
+        "effective": {
+          "mr-root": 100,
+          "mr-alice": 40,
+          "mr-harbour": 35,
+          "mr-raj": 24.5,
+          "mr-mei": 10.5,
+          "mr-david": 25
+        }
+      }
+    },
+    {
+      "id": "S-02",
+      "caseId": "case-0142",
+      "input": {
+        "id": "case-0142",
+        "legalName": "Northwind Community Foundation",
+        "entityType": "charity",
+        "status": "BUILDING",
+        "parties": [
+          {
+            "id": "nw-root",
+            "parentId": null,
+            "kind": "ENTITY",
+            "legalName": "Northwind Community Foundation",
+            "entityType": "charity",
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": false,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "nw-grace",
+            "parentId": "nw-root",
+            "kind": "PERSON",
+            "legalName": "Grace Morrison",
+            "entityType": null,
+            "country": "Canada",
+            "title": "Director",
+            "usTaxClass": null,
+            "ownershipPercent": 0,
+            "isController": true,
+            "isSigningAuthority": true,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "nw-omar",
+            "parentId": "nw-root",
+            "kind": "PERSON",
+            "legalName": "Omar Haddad",
+            "entityType": null,
+            "country": "Canada",
+            "title": "Director",
+            "usTaxClass": null,
+            "ownershipPercent": 0,
+            "isController": true,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "nw-lena",
+            "parentId": "nw-root",
+            "kind": "PERSON",
+            "legalName": "Lena Kowalski",
+            "entityType": null,
+            "country": "Canada",
+            "title": "Officer",
+            "usTaxClass": null,
+            "ownershipPercent": 0,
+            "isController": false,
+            "isSigningAuthority": true,
+            "isUsPerson": false,
+            "isPepHio": false
+          }
+        ],
+        "profile": {
+          "province": "",
+          "taxResidency": "CANADA",
+          "features": [],
+          "trustedContact": null,
+          "trustedContactName": ""
+        },
+        "ruleVersion": "demo-2026-10-04",
+        "checklist": {},
+        "customRequirements": [],
+        "tasks": []
+      },
+      "expected": {
+        "ownershipIssues": [],
+        "detailsGaps": [
+          {
+            "field": "province",
+            "message": "Select the province or territory of registration."
+          },
+          {
+            "field": "trustedContact",
+            "message": "Record whether a Trusted Contact Person is designated."
+          }
+        ],
+        "checklist": [
+          {
+            "id": "naaf",
+            "section": "Entity Formation & Authorization",
+            "name": "New Account Application Form (NAAF)",
+            "conditional": false,
+            "source": "FCC guide §5.2",
+            "reason": "Required for every new account. Include the CRA Business Number when applicable.",
+            "partyIds": [],
+            "custom": false
+          },
+          {
+            "id": "formation",
+            "section": "Entity Formation & Authorization",
+            "name": "Articles / formation or governing document",
+            "conditional": false,
+            "source": "FCC guide §3",
+            "reason": "Confirms the entity exists and who governs it.",
+            "partyIds": [],
+            "custom": false
+          },
+          {
+            "id": "resolution",
+            "section": "Entity Formation & Authorization",
+            "name": "Corporate resolution / signing authority evidence",
+            "conditional": false,
+            "source": "FCC guide §5.2",
+            "reason": "Entity type acts through a board or governing body.",
+            "partyIds": [
+              "nw-grace",
+              "nw-omar",
+              "nw-lena"
+            ],
+            "custom": false
+          },
+          {
+            "id": "directors",
+            "section": "Entity Formation & Authorization",
+            "name": "Director listing",
+            "conditional": false,
+            "source": "FCC guide",
+            "reason": "This entity type is governed by a board of directors.",
+            "partyIds": [],
+            "custom": false
+          },
+          {
+            "id": "identity",
+            "section": "Persons to Identify",
+            "name": "Identity verification for signers and controllers",
+            "conditional": false,
+            "source": "FINTRAC; Compliance approval required",
+            "reason": "Persons with ≥25% ownership, control or signing authority must be identified.",
+            "partyIds": [
+              "nw-grace",
+              "nw-omar",
+              "nw-lena"
+            ],
+            "custom": false
+          }
+        ],
+        "collected": 0,
+        "stage": "DETAILS",
+        "blocker": "Select the province or territory of registration.",
+        "openTasks": 0,
+        "identify": [
+          "nw-grace",
+          "nw-omar",
+          "nw-lena"
+        ],
+        "effective": {
+          "nw-root": 100,
+          "nw-grace": 0,
+          "nw-omar": 0,
+          "nw-lena": 0
+        }
+      }
+    },
+    {
+      "id": "S-03",
+      "caseId": "case-0137",
+      "input": {
+        "id": "case-0137",
+        "legalName": "Thompson Family Trust",
+        "entityType": "trust",
+        "status": "READY_FOR_COMPLIANCE",
+        "parties": [
+          {
+            "id": "tf-root",
+            "parentId": null,
+            "kind": "ENTITY",
+            "legalName": "Thompson Family Trust",
+            "entityType": "trust",
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": false,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "tf-robert",
+            "parentId": "tf-root",
+            "kind": "PERSON",
+            "legalName": "Robert Thompson",
+            "entityType": null,
+            "country": "Canada",
+            "title": "Trustee",
+            "usTaxClass": null,
+            "ownershipPercent": 0,
+            "isController": true,
+            "isSigningAuthority": true,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "tf-emily",
+            "parentId": "tf-root",
+            "kind": "PERSON",
+            "legalName": "Emily Thompson",
+            "entityType": null,
+            "country": "Canada",
+            "title": "Beneficiary",
+            "usTaxClass": null,
+            "ownershipPercent": 50,
+            "isController": false,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "tf-james",
+            "parentId": "tf-root",
+            "kind": "PERSON",
+            "legalName": "James Thompson",
+            "entityType": null,
+            "country": "Canada",
+            "title": "Beneficiary",
+            "usTaxClass": null,
+            "ownershipPercent": 50,
+            "isController": false,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          }
+        ],
+        "profile": {
+          "province": "BC",
+          "taxResidency": "CANADA",
+          "features": [
+            "COD_DVP"
+          ],
+          "trustedContact": false,
+          "trustedContactName": ""
+        },
+        "ruleVersion": "demo-2026-10-04",
+        "checklist": {
+          "naaf": {
+            "status": "VERIFIED",
+            "documentIds": [
+              "t-1"
+            ]
+          },
+          "formation": {
+            "status": "VERIFIED",
+            "documentIds": [
+              "t-2"
+            ]
+          },
+          "beneficial-owner": {
+            "status": "RECEIVED",
+            "documentIds": [
+              "t-3"
+            ]
+          },
+          "identity": {
+            "status": "RECEIVED",
+            "documentIds": [
+              "t-4"
+            ]
+          },
+          "cod-dvp": {
+            "status": "RECEIVED",
+            "documentIds": [
+              "t-5"
+            ]
+          }
+        },
+        "customRequirements": [],
+        "tasks": []
+      },
+      "expected": {
+        "ownershipIssues": [],
+        "detailsGaps": [],
+        "checklist": [
+          {
+            "id": "naaf",
+            "section": "Entity Formation & Authorization",
+            "name": "New Account Application Form (NAAF)",
+            "conditional": false,
+            "source": "FCC guide §5.2",
+            "reason": "Required for every new account. Include the CRA Business Number when applicable.",
+            "partyIds": [],
+            "custom": false
+          },
+          {
+            "id": "formation",
+            "section": "Entity Formation & Authorization",
+            "name": "Articles / formation or governing document",
+            "conditional": false,
+            "source": "FCC guide §3",
+            "reason": "Confirms the entity exists and who governs it.",
+            "partyIds": [],
+            "custom": false
+          },
+          {
+            "id": "beneficial-owner",
+            "section": "Entity Formation & Authorization",
+            "name": "Beneficial Owner Identification",
+            "conditional": false,
+            "source": "CIRO 3203–3204; Compliance approval required",
+            "reason": "CIRO/FINTRAC ownership and control record.",
+            "partyIds": [
+              "tf-robert",
+              "tf-emily",
+              "tf-james"
+            ],
+            "custom": false
+          },
+          {
+            "id": "identity",
+            "section": "Persons to Identify",
+            "name": "Identity verification for signers and controllers",
+            "conditional": false,
+            "source": "FINTRAC; Compliance approval required",
+            "reason": "Persons with ≥25% ownership, control or signing authority must be identified.",
+            "partyIds": [
+              "tf-robert",
+              "tf-emily",
+              "tf-james"
+            ],
+            "custom": false
+          },
+          {
+            "id": "cod-dvp",
+            "section": "Account Features",
+            "name": "COD / DVP settlement instructions",
+            "conditional": true,
+            "source": "FCC guide §5.2",
+            "reason": "COD / DVP settlement selected.",
+            "partyIds": [],
+            "custom": false
+          }
+        ],
+        "collected": 5,
+        "stage": "COMPLIANCE",
+        "blocker": null,
+        "openTasks": 0,
+        "identify": [
+          "tf-robert",
+          "tf-emily",
+          "tf-james"
+        ],
+        "effective": {
+          "tf-root": 100,
+          "tf-robert": 0,
+          "tf-emily": 50,
+          "tf-james": 50
+        }
+      }
+    },
+    {
+      "id": "S-04",
+      "caseId": "case-0131",
+      "input": {
+        "id": "case-0131",
+        "legalName": "Lakeshore Condominium Corporation No. 482",
+        "entityType": "condo",
+        "status": "BUILDING",
+        "parties": [
+          {
+            "id": "lc-root",
+            "parentId": null,
+            "kind": "ENTITY",
+            "legalName": "Lakeshore Condominium Corporation No. 482",
+            "entityType": "condo",
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": false,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          }
+        ],
+        "profile": {
+          "province": "",
+          "taxResidency": null,
+          "features": [],
+          "trustedContact": null,
+          "trustedContactName": ""
+        },
+        "ruleVersion": "demo-2026-10-04",
+        "checklist": {},
+        "customRequirements": [],
+        "tasks": []
+      },
+      "expected": {
+        "ownershipIssues": [
+          {
+            "code": "MISSING_OWNER",
+            "partyId": "lc-root",
+            "message": "Lakeshore Condominium Corporation No. 482 must disclose an owner or controller."
+          }
+        ],
+        "detailsGaps": [
+          {
+            "field": "province",
+            "message": "Select the province or territory of registration."
+          },
+          {
+            "field": "taxResidency",
+            "message": "Select the entity's tax residency."
+          },
+          {
+            "field": "trustedContact",
+            "message": "Record whether a Trusted Contact Person is designated."
+          }
+        ],
+        "checklist": [
+          {
+            "id": "naaf",
+            "section": "Entity Formation & Authorization",
+            "name": "New Account Application Form (NAAF)",
+            "conditional": false,
+            "source": "FCC guide §5.2",
+            "reason": "Required for every new account. Include the CRA Business Number when applicable.",
+            "partyIds": [],
+            "custom": false
+          },
+          {
+            "id": "formation",
+            "section": "Entity Formation & Authorization",
+            "name": "Articles / formation or governing document",
+            "conditional": false,
+            "source": "FCC guide §3",
+            "reason": "Confirms the entity exists and who governs it.",
+            "partyIds": [],
+            "custom": false
+          },
+          {
+            "id": "resolution",
+            "section": "Entity Formation & Authorization",
+            "name": "Corporate resolution / signing authority evidence",
+            "conditional": false,
+            "source": "FCC guide §5.2",
+            "reason": "Entity type acts through a board or governing body.",
+            "partyIds": [],
+            "custom": false
+          },
+          {
+            "id": "directors",
+            "section": "Entity Formation & Authorization",
+            "name": "Director listing",
+            "conditional": false,
+            "source": "FCC guide",
+            "reason": "This entity type is governed by a board of directors.",
+            "partyIds": [],
+            "custom": false
+          }
+        ],
+        "collected": 0,
+        "stage": "OWNERSHIP",
+        "blocker": "Lakeshore Condominium Corporation No. 482 must disclose an owner or controller.",
+        "openTasks": 0,
+        "identify": [],
+        "effective": {
+          "lc-root": 100
+        }
+      }
+    },
+    {
+      "id": "S-05",
+      "caseId": "case-0128",
+      "input": {
+        "id": "case-0128",
+        "legalName": "Pacific Rim Ventures LP",
+        "entityType": "partnership",
+        "status": "RETURNED",
+        "parties": [
+          {
+            "id": "pr-root",
+            "parentId": null,
+            "kind": "ENTITY",
+            "legalName": "Pacific Rim Ventures LP",
+            "entityType": "partnership",
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": false,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "pr-gp",
+            "parentId": "pr-root",
+            "kind": "ENTITY",
+            "legalName": "Pacific Rim GP Inc.",
+            "entityType": "corporation",
+            "country": "Canada",
+            "title": "General Partner",
+            "usTaxClass": null,
+            "ownershipPercent": 1,
+            "isController": true,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "pr-wei",
+            "parentId": "pr-root",
+            "kind": "PERSON",
+            "legalName": "Wei Zhang",
+            "entityType": null,
+            "country": "Singapore",
+            "title": "Limited Partner",
+            "usTaxClass": null,
+            "ownershipPercent": 60,
+            "isController": false,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "pr-sophie",
+            "parentId": "pr-root",
+            "kind": "PERSON",
+            "legalName": "Sophie Martin",
+            "entityType": null,
+            "country": "France",
+            "title": "Limited Partner",
+            "usTaxClass": null,
+            "ownershipPercent": 30,
+            "isController": false,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          }
+        ],
+        "profile": {
+          "province": "BC",
+          "taxResidency": "INTERNATIONAL",
+          "features": [
+            "FPL"
+          ],
+          "trustedContact": false,
+          "trustedContactName": ""
+        },
+        "ruleVersion": "demo-2026-10-04",
+        "checklist": {
+          "naaf": {
+            "status": "VERIFIED",
+            "documentIds": [
+              "p-1"
+            ]
+          },
+          "formation": {
+            "status": "REJECTED",
+            "documentIds": [
+              "p-2"
+            ]
+          },
+          "w8": {
+            "status": "RECEIVED",
+            "documentIds": [
+              "p-3"
+            ]
+          },
+          "identity": {
+            "status": "REQUESTED",
+            "documentIds": []
+          },
+          "beneficial-owner": {
+            "status": "REQUESTED",
+            "documentIds": []
+          }
+        },
+        "customRequirements": [],
+        "tasks": [
+          {
+            "id": "task-1",
+            "title": "Disclose the shareholders of Pacific Rim GP Inc. down to natural persons.",
+            "partyId": "pr-gp",
+            "done": false
+          },
+          {
+            "id": "task-2",
+            "title": "Limited partner interests total 91%; confirm the remaining 9%.",
+            "partyId": "pr-root",
+            "done": false
+          },
+          {
+            "id": "task-3",
+            "title": "LP agreement is missing Schedule B (signing pages).",
+            "requirementId": "formation",
+            "done": false
+          }
+        ]
+      },
+      "expected": {
+        "ownershipIssues": [
+          {
+            "code": "OWNERSHIP_TOTAL",
+            "partyId": "pr-root",
+            "message": "Pacific Rim Ventures LP ownership totals 91%."
+          },
+          {
+            "code": "ENTITY_LEAF",
+            "partyId": "pr-gp",
+            "message": "Pacific Rim GP Inc. must disclose an owner or controller."
+          }
+        ],
+        "detailsGaps": [],
+        "checklist": [
+          {
+            "id": "naaf",
+            "section": "Entity Formation & Authorization",
+            "name": "New Account Application Form (NAAF)",
+            "conditional": false,
+            "source": "FCC guide §5.2",
+            "reason": "Required for every new account. Include the CRA Business Number when applicable.",
+            "partyIds": [],
+            "custom": false
+          },
+          {
+            "id": "formation",
+            "section": "Entity Formation & Authorization",
+            "name": "Articles / formation or governing document",
+            "conditional": false,
+            "source": "FCC guide §3",
+            "reason": "Confirms the entity exists and who governs it.",
+            "partyIds": [],
+            "custom": false
+          },
+          {
+            "id": "beneficial-owner",
+            "section": "Entity Formation & Authorization",
+            "name": "Beneficial Owner Identification",
+            "conditional": false,
+            "source": "CIRO 3203–3204; Compliance approval required",
+            "reason": "CIRO/FINTRAC ownership and control record.",
+            "partyIds": [
+              "pr-wei",
+              "pr-sophie"
+            ],
+            "custom": false
+          },
+          {
+            "id": "identity",
+            "section": "Persons to Identify",
+            "name": "Identity verification for signers and controllers",
+            "conditional": false,
+            "source": "FINTRAC; Compliance approval required",
+            "reason": "Persons with ≥25% ownership, control or signing authority must be identified.",
+            "partyIds": [
+              "pr-wei",
+              "pr-sophie"
+            ],
+            "custom": false
+          },
+          {
+            "id": "fpl",
+            "section": "Account Features",
+            "name": "Fully Paid Lending agreement and risk disclosure",
+            "conditional": true,
+            "source": "FCC guide §5.2",
+            "reason": "Fully paid securities lending selected.",
+            "partyIds": [],
+            "custom": false
+          },
+          {
+            "id": "w8",
+            "section": "IRS / Withholding Tax",
+            "name": "W-8BEN-E or applicable treaty statement",
+            "conditional": true,
+            "source": "FCC guide §5.2",
+            "reason": "International or mixed tax residency.",
+            "partyIds": [],
+            "custom": false
+          },
+          {
+            "id": "rc519",
+            "section": "FATCA / CRS",
+            "name": "RC519 Declaration of Tax Residence",
+            "conditional": true,
+            "source": "FCC guide §5.2",
+            "reason": "Tax residency is outside Canada.",
+            "partyIds": [],
+            "custom": false
+          },
+          {
+            "id": "nffe",
+            "section": "FATCA / CRS",
+            "name": "Passive NFFE controlling-person certification",
+            "conditional": true,
+            "source": "FCC guide",
+            "reason": "International residency. If the entity is a passive NFFE, each controlling person at or above 25% certifies.",
+            "partyIds": [
+              "pr-wei",
+              "pr-sophie"
+            ],
+            "custom": false
+          }
+        ],
+        "collected": 2,
+        "stage": "OWNERSHIP",
+        "blocker": "3 compliance tasks open",
+        "openTasks": 3,
+        "identify": [
+          "pr-wei",
+          "pr-sophie"
+        ],
+        "effective": {
+          "pr-root": 100,
+          "pr-gp": 1,
+          "pr-wei": 60,
+          "pr-sophie": 30
+        }
+      }
+    },
+    {
+      "id": "S-06",
+      "caseId": "case-0119",
+      "input": {
+        "id": "case-0119",
+        "legalName": "Eagle River First Nation",
+        "entityType": "first_nation",
+        "status": "APPROVED",
+        "parties": [
+          {
+            "id": "er-root",
+            "parentId": null,
+            "kind": "ENTITY",
+            "legalName": "Eagle River First Nation",
+            "entityType": "first_nation",
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": false,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "er-chief",
+            "parentId": "er-root",
+            "kind": "PERSON",
+            "legalName": "Chief Thomas Redsky",
+            "entityType": null,
+            "country": "Canada",
+            "title": "Chief",
+            "usTaxClass": null,
+            "ownershipPercent": 0,
+            "isController": true,
+            "isSigningAuthority": true,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "er-council",
+            "parentId": "er-root",
+            "kind": "PERSON",
+            "legalName": "Marie Whitehorse",
+            "entityType": null,
+            "country": "Canada",
+            "title": "Councillor",
+            "usTaxClass": null,
+            "ownershipPercent": 0,
+            "isController": false,
+            "isSigningAuthority": true,
+            "isUsPerson": false,
+            "isPepHio": false
+          }
+        ],
+        "profile": {
+          "province": "MB",
+          "taxResidency": "CANADA",
+          "features": [],
+          "trustedContact": false,
+          "trustedContactName": ""
+        },
+        "ruleVersion": "demo-2026-10-04",
+        "checklist": {
+          "naaf": {
+            "status": "VERIFIED",
+            "documentIds": [
+              "e-1"
+            ]
+          },
+          "formation": {
+            "status": "VERIFIED",
+            "documentIds": [
+              "e-2"
+            ]
+          },
+          "resolution": {
+            "status": "VERIFIED",
+            "documentIds": [
+              "e-3"
+            ]
+          },
+          "identity": {
+            "status": "VERIFIED",
+            "documentIds": [
+              "e-4"
+            ]
+          }
+        },
+        "customRequirements": [],
+        "tasks": []
+      },
+      "expected": {
+        "ownershipIssues": [],
+        "detailsGaps": [],
+        "checklist": [
+          {
+            "id": "naaf",
+            "section": "Entity Formation & Authorization",
+            "name": "New Account Application Form (NAAF)",
+            "conditional": false,
+            "source": "FCC guide §5.2",
+            "reason": "Required for every new account. Include the CRA Business Number when applicable.",
+            "partyIds": [],
+            "custom": false
+          },
+          {
+            "id": "formation",
+            "section": "Entity Formation & Authorization",
+            "name": "Articles / formation or governing document",
+            "conditional": false,
+            "source": "FCC guide §3",
+            "reason": "Confirms the entity exists and who governs it.",
+            "partyIds": [],
+            "custom": false
+          },
+          {
+            "id": "resolution",
+            "section": "Entity Formation & Authorization",
+            "name": "Corporate resolution / signing authority evidence",
+            "conditional": false,
+            "source": "FCC guide §5.2",
+            "reason": "Entity type acts through a board or governing body.",
+            "partyIds": [
+              "er-chief",
+              "er-council"
+            ],
+            "custom": false
+          },
+          {
+            "id": "identity",
+            "section": "Persons to Identify",
+            "name": "Identity verification for signers and controllers",
+            "conditional": false,
+            "source": "FINTRAC; Compliance approval required",
+            "reason": "Persons with ≥25% ownership, control or signing authority must be identified.",
+            "partyIds": [
+              "er-chief",
+              "er-council"
+            ],
+            "custom": false
+          }
+        ],
+        "collected": 4,
+        "stage": "DONE",
+        "blocker": null,
+        "openTasks": 0,
+        "identify": [
+          "er-chief",
+          "er-council"
+        ],
+        "effective": {
+          "er-root": 100,
+          "er-chief": 0,
+          "er-council": 0
+        }
+      }
+    },
+    {
+      "id": "S-07",
+      "caseId": "case-0144",
+      "input": {
+        "id": "case-0144",
+        "legalName": "Okafor Dental Professional Corporation IPP",
+        "entityType": "ipp_rca",
+        "status": "BUILDING",
+        "parties": [
+          {
+            "id": "od-root",
+            "parentId": null,
+            "kind": "ENTITY",
+            "legalName": "Okafor Dental Professional Corporation IPP",
+            "entityType": "ipp_rca",
+            "country": null,
+            "title": null,
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": false,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          },
+          {
+            "id": "od-sponsor",
+            "parentId": "od-root",
+            "kind": "ENTITY",
+            "legalName": "Okafor Dental Professional Corporation",
+            "entityType": "corporation",
+            "country": "Canada",
+            "title": "Plan Sponsor",
+            "usTaxClass": null,
+            "ownershipPercent": 100,
+            "isController": true,
+            "isSigningAuthority": false,
+            "isUsPerson": false,
+            "isPepHio": false
+          }
+        ],
+        "profile": {
+          "province": "AB",
+          "taxResidency": null,
+          "features": [],
+          "trustedContact": null,
+          "trustedContactName": ""
+        },
+        "ruleVersion": "demo-2026-10-04",
+        "checklist": {},
+        "customRequirements": [],
+        "tasks": []
+      },
+      "expected": {
+        "ownershipIssues": [
+          {
+            "code": "ENTITY_LEAF",
+            "partyId": "od-sponsor",
+            "message": "Okafor Dental Professional Corporation must disclose an owner or controller."
+          }
+        ],
+        "detailsGaps": [
+          {
+            "field": "taxResidency",
+            "message": "Select the entity's tax residency."
+          },
+          {
+            "field": "trustedContact",
+            "message": "Record whether a Trusted Contact Person is designated."
+          }
+        ],
+        "checklist": [
+          {
+            "id": "naaf",
+            "section": "Entity Formation & Authorization",
+            "name": "New Account Application Form (NAAF)",
+            "conditional": false,
+            "source": "FCC guide §5.2",
+            "reason": "Required for every new account. Include the CRA Business Number when applicable.",
+            "partyIds": [],
+            "custom": false
+          },
+          {
+            "id": "formation",
+            "section": "Entity Formation & Authorization",
+            "name": "Articles / formation or governing document",
+            "conditional": false,
+            "source": "FCC guide §3",
+            "reason": "Confirms the entity exists and who governs it.",
+            "partyIds": [],
+            "custom": false
+          },
+          {
+            "id": "beneficial-owner",
+            "section": "Entity Formation & Authorization",
+            "name": "Beneficial Owner Identification",
+            "conditional": false,
+            "source": "CIRO 3203–3204; Compliance approval required",
+            "reason": "CIRO/FINTRAC ownership and control record.",
+            "partyIds": [],
+            "custom": false
+          }
+        ],
+        "collected": 0,
+        "stage": "OWNERSHIP",
+        "blocker": "Okafor Dental Professional Corporation must disclose an owner or controller.",
+        "openTasks": 0,
+        "identify": [],
+        "effective": {
+          "od-root": 100,
+          "od-sponsor": 100
+        }
+      }
+    }
+  ]
+}
