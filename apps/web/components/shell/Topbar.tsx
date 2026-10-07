@@ -1,8 +1,8 @@
 "use client";
 
-import { Bell, CornerDownLeft, FolderKanban, Plus, Search, User } from "lucide-react";
+import { Bell, CornerDownLeft, FolderKanban, Search, User } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { apiSearch, apiTaskTotal } from "@/lib/data/api";
 import { useSession } from "@/lib/data/hooks";
@@ -10,23 +10,9 @@ import { isApiMode } from "@/lib/data/source";
 import { ENTITY_LABELS } from "@/lib/labels";
 import { EntityIcon, StatusBadge } from "@/components/ui";
 
-const TITLES: Array<[RegExp, string]> = [
-  [/^\/$/, "Dashboard"],
-  [/^\/cases\/new/, "New case"],
-  [/^\/cases\/[^/]+/, "Case workspace"],
-  [/^\/cases/, "Cases"],
-  [/^\/compliance/, "Compliance review"],
-  [/^\/entities/, "Entities & people"],
-  [/^\/document-ai/, "Document AI"],
-  [/^\/rules/, "Rule library"],
-  [/^\/audit/, "Audit log"],
-];
-
 export function Topbar() {
-  const pathname = usePathname();
   const session = useSession();
   const [paletteOpen, setPaletteOpen] = useState(false);
-  const title = TITLES.find(([pattern]) => pattern.test(pathname))?.[1] ?? "Workbench";
   const [openTasks, setOpenTasks] = useState(0);
   const localTasks = session?.db.cases.reduce((sum, item) => sum + item.tasks.filter((task) => !task.done).length, 0) ?? 0;
   useEffect(() => {
@@ -45,13 +31,11 @@ export function Topbar() {
 
   return (
     <header className="topbar">
-      <div className="topbar-title">{title}</div>
       <button className="topbar-search" onClick={() => setPaletteOpen(true)}>
         <Search size={15} /><span>Search cases, entities, people…</span><span className="kbd">⌘K</span>
       </button>
       <div className="topbar-actions">
         <Link href="/cases?filter=RETURNED" className={`btn btn-ghost btn-icon${taskCount ? " icon-dot" : ""}`} aria-label={`${taskCount} open tasks`} title={`${taskCount} open follow-up tasks`}><Bell /></Link>
-        {session?.user.role !== "COMPLIANCE" && <Link href="/cases/new" className="btn btn-primary"><Plus />New case</Link>}
       </div>
       {paletteOpen && <CommandPalette onClose={() => setPaletteOpen(false)} />}
     </header>

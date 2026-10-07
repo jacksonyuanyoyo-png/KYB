@@ -52,8 +52,8 @@ export function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="brand">
-        <span className="brand-mark">F</span>
-        <div><div className="brand-name">FIDELITY</div><div className="brand-sub">Complex Account Workbench</div></div>
+        <span className="brand-mark" role="img" aria-label="Fidelity" />
+        <div className="brand-sub">Complex Account Workbench</div>
       </div>
       <nav className="nav" aria-label="Primary">
         {groups.map((group, index) => (

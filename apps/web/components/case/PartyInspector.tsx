@@ -128,7 +128,10 @@ export function PartyEditor({ party, editable, pending, onClose, onSave, onRemov
         <label className="field"><span>Legal name</span><input className="input" disabled={!editable || isRoot} value={draft.legalName} onChange={(event) => set("legalName", event.target.value)} /></label>
         {party.kind === "ENTITY" && (
           <label className="field"><span>Entity type</span>
-            <select className="select" disabled={!editable || isRoot} value={draft.entityType} onChange={(event) => set("entityType", event.target.value as EntityType)}>{ENTITY_TYPES.map((type) => <option key={type} value={type}>{ENTITY_LABELS[type]}</option>)}</select>
+            <select className="select" disabled={!editable || isRoot} value={draft.entityType ?? ""} onChange={(event) => set("entityType", (event.target.value || undefined) as EntityType | undefined)}>
+              <option value="">Select…</option>
+              {ENTITY_TYPES.map((type) => <option key={type} value={type}>{ENTITY_LABELS[type]}</option>)}
+            </select>
           </label>
         )}
         {!isRoot && (
